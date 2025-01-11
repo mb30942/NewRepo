@@ -9,5 +9,5 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // Configure en>ty rela>onships and constraints
         base.OnModelCreating(modelBuilder);
     }
-    //public DbSet<Item> Items { get; set; }
+
 }
