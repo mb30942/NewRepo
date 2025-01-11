@@ -2,30 +2,46 @@
 @{
     ViewData["Title"] = "Register";
 }
-<h2>@ViewData["Title"]</h2>
-@using (Html.BeginForm("Register", "Account", FormMethod.Post))
-{
-    <div asp-validation-summary="All" class="text-danger">
+<div class="d-flex justify-content-center align-items-center vh-100" style="background-color: #d9534f;">
+    <div class="card shadow" style="width: 22rem;">
+        <div class="card-body">
+            <h3 class="card-title text-center">Register</h3>
+            @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "Email Address" })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "form-label" })
+                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Password" })
+                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.ConfirmPassword, htmlAttributes: new { @class = "form-label" })
+                    @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control", placeholder = "Confirm Password" })
+                    @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.UserRole, htmlAttributes: new { @class = "form-label" })
+                    @Html.DropDownListFor(model => model.UserRole, Model.UserRoleList, "Select Role", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.UserRole, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-block">Register</button>
+                </div>
+                <p class="text-center mt-3">
+                    <a asp-action="Login" asp-controller="Account">Already have an account? Log in here.</a>
+                </p>
+            }
+        </div>
     </div>
-    <div class="form-group">
-        @Html.LabelFor(model => model.Email)
-        @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(model => model.Password)
-        @Html.PasswordFor(model => model.Password, new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(model => model.ConfirmPassword)
-        @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(model => model.UserRole)
-        @Html.DropDownListFor(model => model.UserRole, Model.UserRoleList, "Select Role", new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.UserRole, "", new { @class = "text-danger" })
-    </div>
-    <button type="submit" class="btn btn-primary">Register</button>
-}
+</div>
