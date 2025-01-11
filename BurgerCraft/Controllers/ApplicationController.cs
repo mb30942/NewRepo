@@ -62,7 +62,7 @@ namespace BurgerCraft.Controllers
                     }
                     await _userManager.AddToRoleAsync(user, model.UserRole);
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Burger");
                 }
             }
             return View(model);
@@ -87,7 +87,7 @@ namespace BurgerCraft.Controllers
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
             if (result.Succeeded)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Burger");
             }
             if (result.IsLockedOut)
             {
@@ -104,7 +104,7 @@ namespace BurgerCraft.Controllers
             }
             else
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Burger");
             }
         }
         [HttpPost]

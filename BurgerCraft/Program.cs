@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BurgerCraft.Models;
+using BurgerCraft.Repositories.Implementations;
+using BurgerCraft.Repositories.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 IConfigurationRoot configuration = new ConfigurationBuilder()
@@ -11,20 +13,18 @@ IConfigurationRoot configuration = new ConfigurationBuilder()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
  options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
+
+builder.Services.AddScoped<IBurgerRepository, BurgerRepository>();
 
 // Add Identity services, specifying ApplicationUser and IdentityRole.
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-
+// Add services to the container.
+builder.Services.AddControllersWithViews();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 
