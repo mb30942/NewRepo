@@ -1,0 +1,52 @@
+﻿@model IEnumerable<BurgerCraft.Models.Burger>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burger Craft</title>
+  
+</head>
+
+<body>
+    <div class="container my-5">
+        <!-- Header Section -->
+        <div class="text-center mb-4">
+            <h1 class="fw-bold">Burger Craft</h1>
+            <p class="text-muted">Subheading that sets up context, shares more info about the website, or generally gets people psyched to keep scrolling.</p>
+        </div>
+
+        <!-- Banner Section -->
+        <div class="mb-5">
+            <img src="~/images/dashboard.png" alt="Burger Banner" class="img-fluid rounded shadow">
+        </div>
+
+        <!-- Menu Section -->
+        <h2 class="mb-4 fw-bold">BurgerCraft Menu</h2>
+        <div class="row g-4">
+            @foreach (var burger in Model)
+            {
+                <div class="col-md-4 col-sm-6">
+                    <div class="card shadow-sm h-100">
+                        <img src="~/images/dashboard.png" class="card-img-top" alt="@burger.Name">
+                        <div class="card-body">
+                            <h5 class="card-title">@burger.Name</h5>
+                            <p class="card-text text-muted">@burger.Description</p>
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-primary btn-sm">Edit</button>
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
