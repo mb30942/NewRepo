@@ -24,6 +24,7 @@ namespace BurgerCraft.Controllers
             return View();
         }
         [HttpGet]
+        //tijana test
         public IActionResult Register()
         {
             var roles = new List<SelectListItem>
