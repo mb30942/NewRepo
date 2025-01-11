@@ -1,0 +1,27 @@
+﻿.bg-red {
+    background-color: #d9534f; /* Custom red background color */
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+    .navbar-brand img {
+        margin-right: 50px;
+    }
+
+.navbar-nav .nav-item .nav-link {
+    color: #000;
+    margin-right: 15px;
+}
+
+.navbar-nav .nav-item .btn-dark {
+    background-color: #000;
+    border: none;
+    padding: 5px 15px;
+}
+
+    .navbar-nav .nav-item .btn-dark:hover {
+        background-color: #444;
+    }
