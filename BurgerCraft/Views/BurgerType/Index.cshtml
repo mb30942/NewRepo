@@ -1,0 +1,63 @@
+﻿@model IEnumerable<BurgerCraft.Models.BurgerType>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Burger Types</title>
+</head>
+
+<body>
+    <div class="container my-5">
+        <!-- Header Section -->
+        <div class="text-center mb-4">
+            <h1 class="fw-bold">Manage Burger Types</h1>
+            <p class="text-muted">View, add, or delete burger types from the system.</p>
+        </div>
+
+        <!-- Add New Burger Type Form -->
+        <div class="mb-4">
+            <div class="mb-4 text-end">
+                <a href="@Url.Action("Create", "BurgerType")" class="btn btn-success">Add New Burger Type</a>
+            </div>
+            
+
+        </div>
+
+
+        <!-- List of Burger Types -->
+        <h3 class="mb-3">Existing Burger Types</h3>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var burgerType in Model)
+                {
+                    <tr>
+                        <td>@burgerType.Id</td>
+                        <td>@burgerType.Name</td>
+                        <td>
+                            @using (Html.BeginForm("Delete", "BurgerType", FormMethod.Post))
+                            {
+                                @Html.Hidden("Id", burgerType.Id)
+                                <button type="submit">Delete</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

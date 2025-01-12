@@ -22,7 +22,9 @@
         <div class="mb-5">
             <img src="~/images/dashboard.png" alt="Burger Banner" class="img-fluid rounded shadow">
         </div>
-
+        <div class="mb-4 text-end">
+            <a href="@Url.Action("Index", "BurgerType")" class="btn btn-success">Add New Burger Type</a>
+        </div>
         <!-- Menu Section -->
         <h2 class="mb-4 fw-bold">BurgerCraft Menu</h2>
         <div class="row g-4">
@@ -30,7 +32,9 @@
             {
                 <div class="col-md-4 col-sm-6">
                     <div class="card shadow-sm h-100">
-                        <img src="~/images/dashboard.png" class="card-img-top" alt="@burger.Name">
+                        <img src="@Url.Content(burger.ImagePath ?? "/images/dashboard.png")"
+                             alt="@burger.Name" class="card-img-top" />
+                        
                         <div class="card-body">
                             <h5 class="card-title">@burger.Name</h5>
                             <p class="card-text text-muted">@burger.Description</p>
