@@ -1,5 +1,5 @@
 ﻿using BurgerCraft.Models;
-using BurgerCraft.Repositories.Implementations;
+using BurgerCraft.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BurgerCraft.Controllers

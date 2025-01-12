@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BurgerCraft.Models;
-using BurgerCraft.Repositories.Implementations;
 using BurgerCraft.Repositories.Interfaces;
+using BurgerCraft.Repositories.Implementations;
 var builder = WebApplication.CreateBuilder(args);
 
 IConfigurationRoot configuration = new ConfigurationBuilder()
@@ -18,8 +18,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 builder.Services.AddScoped<IBurgerRepository, BurgerRepository>();
-builder.Services.AddScoped<IBurgerTypeRepository, BurgerTypeRepository>();
-
 
 // Add Identity services, specifying ApplicationUser and IdentityRole.
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

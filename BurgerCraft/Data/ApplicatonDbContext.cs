@@ -8,10 +8,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<BurgerType> BurgerTypes { get; set; }
     public DbSet<Burger> Burgers { get; set; }
+    public DbSet<Ingredient> Ingredients { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder
-     .UseNpgsql("Host=localhost;Port=5432;Database=burgerCraft;Username=postgres;Password=postgres")
+     .UseNpgsql("Host=localhost;Port=5432;Database=burgerCraft;Username=postgres;Password=tijana")
      .ConfigureWarnings(warnings => warnings.Default(WarningBehavior.Ignore));
 
     }

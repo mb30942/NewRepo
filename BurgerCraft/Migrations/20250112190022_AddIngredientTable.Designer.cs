@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BurgerCraft.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250112190022_AddIngredientTable")]
+    partial class AddIngredientTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,20 +101,14 @@ namespace BurgerCraft.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("ImagePath")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(10, 2)");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -125,7 +122,6 @@ namespace BurgerCraft.Migrations
                             Id = 1,
                             BurgerTypeId = 1,
                             Description = "Fresh veggie patty with lettuce and tomato",
-                            ImagePath = "/images/veggie-delight.jpg",
                             Name = "Veggie Delight",
                             Price = 5.99m
                         },
@@ -134,7 +130,6 @@ namespace BurgerCraft.Migrations
                             Id = 2,
                             BurgerTypeId = 2,
                             Description = "Grilled chicken with mayo and lettuce",
-                            ImagePath = "/images/chicken-supreme.jpg",
                             Name = "Chicken Supreme",
                             Price = 6.99m
                         },
@@ -143,7 +138,6 @@ namespace BurgerCraft.Migrations
                             Id = 3,
                             BurgerTypeId = 3,
                             Description = "Juicy beef patty with cheddar cheese",
-                            ImagePath = "/images/classic-beef.jpg",
                             Name = "Classic Beef",
                             Price = 7.99m
                         });

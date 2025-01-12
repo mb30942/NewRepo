@@ -1,0 +1,22 @@
+﻿@model BurgerCraft.Models.Ingredient
+
+<h1>Delete Ingredient</h1>
+
+<div>
+    <h3>Are you sure you want to delete this ingredient?</h3>
+    <div>
+        <strong>Name:</strong> @Model.Name
+    </div>
+    <div>
+        <strong>Price:</strong> @Model.Price.ToString("C")
+    </div>
+</div>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.Id) <!-- Hidden field for the Id -->
+
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
