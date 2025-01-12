@@ -1,10 +1,10 @@
 ﻿using BurgerCraft.Models;
+using BurgerCraft.Repositories.Implementations;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BurgerCraft.Repositories.Interfaces;
 
-namespace BurgerCraft.Repositories.Implementations
+namespace BurgerCraft.Repositories.Interfaces
 {
     public class IngredientRepository : IIngredientRepository
     {

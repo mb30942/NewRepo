@@ -1,5 +1,5 @@
 ﻿using BurgerCraft.Models;
-using BurgerCraft.Repositories.Interfaces;
+using BurgerCraft.Repositories.Implementations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;

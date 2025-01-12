@@ -1,6 +1,6 @@
 ﻿using BurgerCraft.Models;
 
-namespace BurgerCraft.Repositories.Interfaces
+namespace BurgerCraft.Repositories.Implementations
 {
     public interface IIngredientRepository
     {
