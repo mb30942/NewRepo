@@ -18,6 +18,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 builder.Services.AddScoped<IBurgerRepository, BurgerRepository>();
+builder.Services.AddScoped<IBurgerTypeRepository, BurgerTypeRepository>();
+
 
 // Add Identity services, specifying ApplicationUser and IdentityRole.
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
