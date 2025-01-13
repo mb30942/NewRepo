@@ -82,11 +82,7 @@ namespace BurgerCraft.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            var burger = _burgerRepository.GetBurgerById(id);
-            if (burger != null)
-            {
-                _burgerRepository.Delete(id);
-            }
+            _burgerRepository.Delete(id);
             return RedirectToAction("Index");
         }
     }
