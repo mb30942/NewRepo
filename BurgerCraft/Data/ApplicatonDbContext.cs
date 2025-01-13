@@ -13,7 +13,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder
-     .UseNpgsql("Host=localhost;Port=5432;Database=burgerCraft;Username=postgres;Password=tijana")
+     .UseNpgsql("Host=localhost;Port=5432;Database=burgerCraft;Username=postgres;Password=postgres")
      .ConfigureWarnings(warnings => warnings.Default(WarningBehavior.Ignore));
 
     }
@@ -55,6 +55,35 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             new Burger { Id = 2, Name = "Chicken Supreme", Price = 6.99M, Description = "Grilled chicken with mayo and lettuce", BurgerTypeId = 2, ImagePath = "/images/chicken-supreme.jpg" },
             new Burger { Id = 3, Name = "Classic Beef", Price = 7.99M, Description = "Juicy beef patty with cheddar cheese", BurgerTypeId = 3, ImagePath = "/images/classic-beef.jpg" }
         );
+
+        modelBuilder.Entity<Ingredient>().HasData(
+            new Ingredient { Id = 1, Name = "Lettuce", Price = 0.50M },
+            new Ingredient { Id = 2, Name = "Tomato", Price = 0.75M },
+            new Ingredient { Id = 3, Name = "Cheddar Cheese", Price = 1.50M },
+            new Ingredient { Id = 4, Name = "Beef Patty", Price = 3.00M },
+            new Ingredient { Id = 5, Name = "Chicken Patty", Price = 2.50M },
+            new Ingredient { Id = 6, Name = "Bacon", Price = 2.00M },
+            new Ingredient { Id = 7, Name = "Egg", Price = 1.20M },
+            new Ingredient { Id = 8, Name = "Ham", Price = 2.50M },
+            new Ingredient { Id = 9, Name = "Turkey Patty", Price = 3.20M },
+            new Ingredient { Id = 10, Name = "Swiss Cheese", Price = 1.70M },
+            new Ingredient { Id = 11, Name = "Blue Cheese", Price = 1.80M },
+            new Ingredient { Id = 12, Name = "Fried Onion Rings", Price = 1.50M },
+            new Ingredient { Id = 13, Name = "BBQ Sauce", Price = 0.40M },
+            new Ingredient { Id = 14, Name = "Honey Mustard", Price = 0.50M },
+            new Ingredient { Id = 15, Name = "Vegan Patty", Price = 3.50M },
+            new Ingredient { Id = 16, Name = "Vegan Cheese", Price = 1.75M },
+            new Ingredient { Id = 17, Name = "Avocado", Price = 2.00M },
+            new Ingredient { Id = 18, Name = "Spinach", Price = 0.70M },
+            new Ingredient { Id = 19, Name = "Grilled Zucchini", Price = 1.20M },
+            new Ingredient { Id = 20, Name = "Hummus", Price = 0.90M },
+            new Ingredient { Id = 21, Name = "Mushrooms", Price = 1.00M },
+            new Ingredient { Id = 22, Name = "Roasted Peppers", Price = 1.30M },
+            new Ingredient { Id = 23, Name = "Vegan Mayo", Price = 0.60M },
+            new Ingredient { Id = 24, Name = "Cucumber Slices", Price = 0.50M },
+            new Ingredient { Id = 25, Name = "Olives", Price = 1.10M }
+        );
+
     }
 
 
