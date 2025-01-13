@@ -13,5 +13,8 @@ namespace BurgerCraft.Models
         [Required(ErrorMessage = "The Price field is required.")]
         [Range(0.01, 1000.00, ErrorMessage = "The Price must be between 0.01 and 1000.00.")]
         public decimal Price { get; set; } // Price of the ingredient
+
+        public ICollection<BurgerIngredient> BurgerIngredients { get; set; } = new List<BurgerIngredient>();
     }
 }
+

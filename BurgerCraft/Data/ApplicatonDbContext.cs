@@ -9,6 +9,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<BurgerType> BurgerTypes { get; set; }
     public DbSet<Burger> Burgers { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
+    public DbSet<BurgerIngredient> burgerIngredients { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder
@@ -20,6 +21,20 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        //Configure relationship between burger and ingredients
+        modelBuilder.Entity<BurgerIngredient>()
+                .HasKey(bi => new { bi.BurgerId, bi.IngredientId });
+
+        modelBuilder.Entity<BurgerIngredient>()
+               .HasOne(bi => bi.Burger)
+               .WithMany(b => b.BurgerIngredients)
+               .HasForeignKey(bi => bi.BurgerId);
+
+        modelBuilder.Entity<BurgerIngredient>()
+            .HasOne(bi => bi.Ingredient)
+            .WithMany(i => i.BurgerIngredients)
+            .HasForeignKey(bi => bi.IngredientId);
 
         // Configure the Burger → BurgerType relationship
         modelBuilder.Entity<Burger>()

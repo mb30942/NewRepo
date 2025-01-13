@@ -15,14 +15,18 @@ namespace BurgerCraft.Repositories.Interfaces
 
         public async Task<IEnumerable<Burger>> GetAllBurgers()
         {
-            return await _context.Burgers.Include(b => b.BurgerType).ToListAsync();
+            return await _context.Burgers.Include(b => b.BurgerType).Include(b => b.BurgerIngredients).ThenInclude(bi => bi.Ingredient).ToListAsync();
         }
 
         public async Task<Burger> GetBurgerById(int id)
         {
-            return await _context.Burgers
-                .Include(b => b.BurgerType)
-                .FirstOrDefaultAsync(b => b.Id == id);
+            return await _context.Burgers.Include(b => b.BurgerType).Include(b => b.BurgerIngredients).ThenInclude(bi => bi.Ingredient).FirstOrDefaultAsync(b => b.Id == id);
+        }
+
+        public async Task AddBurger(Burger burger)
+        {
+            _context.Burgers.Add(burger);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Burger>> GetBurgersByType(int burgerTypeId)
