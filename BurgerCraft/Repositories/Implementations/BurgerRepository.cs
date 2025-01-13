@@ -20,7 +20,14 @@ namespace BurgerCraft.Repositories.Interfaces
 
         public async Task<Burger> GetBurgerById(int id)
         {
-            return await _context.Burgers.Include(b => b.BurgerType).Include(b => b.BurgerIngredients).ThenInclude(bi => bi.Ingredient).FirstOrDefaultAsync(b => b.Id == id);
+            var burger = await _context.Burgers
+            .Include(b => b.BurgerType)
+            .Include(b => b.BurgerIngredients)
+                .ThenInclude(bi => bi.Ingredient)
+            .Where(b => b.Id == id)  // Ensure the burger exists
+            .FirstOrDefaultAsync();
+
+            return burger;
         }
 
         public async Task AddBurger(Burger burger)
@@ -35,6 +42,25 @@ namespace BurgerCraft.Repositories.Interfaces
                 .Where(b => b.BurgerTypeId == burgerTypeId)
                 .Include(b => b.BurgerType)
                 .ToListAsync();
+        }
+        public async Task Delete(int id)
+        {
+            // Find the burger by ID
+            var deleteBurger = await _context.Burgers
+                .Include(b => b.BurgerIngredients)  // Ensure we include the associated ingredients
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (deleteBurger != null)
+            {
+                // Remove the associated BurgerIngredients
+                _context.burgerIngredients.RemoveRange(deleteBurger.BurgerIngredients);
+
+                // Remove the burger itself
+                _context.Burgers.Remove(deleteBurger);
+
+                // Save changes
+                await _context.SaveChangesAsync();
+            }
         }
 
     }
