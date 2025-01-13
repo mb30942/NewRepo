@@ -8,5 +8,6 @@ namespace BurgerCraft.Repositories.Implementations
         Task<Burger> GetBurgerById(int id);
         Task<IEnumerable<Burger>> GetBurgersByType(int burgerTypeId);
         Task AddBurger(Burger burger);
+        Task Delete(int id);
     }
 }

@@ -29,7 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         modelBuilder.Entity<BurgerIngredient>()
                .HasOne(bi => bi.Burger)
                .WithMany(b => b.BurgerIngredients)
-               .HasForeignKey(bi => bi.BurgerId);
+               .HasForeignKey(bi => bi.BurgerId)
+               .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<BurgerIngredient>()
             .HasOne(bi => bi.Ingredient)

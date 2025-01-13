@@ -78,6 +78,13 @@ namespace BurgerCraft.Controllers
                 return View(burger); 
             }
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            _burgerRepository.Delete(id);
+            return RedirectToAction("Index");
+        }
     }
 }
 
