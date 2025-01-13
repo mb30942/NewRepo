@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BurgerCraft.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250113174847_UpdateBurgerIngredientSeed")]
+    partial class UpdateBurgerIngredientSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,9 +160,6 @@ namespace BurgerCraft.Migrations
                     b.Property<int>("IngredientId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
                     b.HasKey("BurgerId", "IngredientId");
 
                     b.HasIndex("IngredientId");
@@ -170,38 +170,32 @@ namespace BurgerCraft.Migrations
                         new
                         {
                             BurgerId = 1,
-                            IngredientId = 1,
-                            Quantity = 1
+                            IngredientId = 1
                         },
                         new
                         {
                             BurgerId = 1,
-                            IngredientId = 2,
-                            Quantity = 1
+                            IngredientId = 2
                         },
                         new
                         {
                             BurgerId = 2,
-                            IngredientId = 1,
-                            Quantity = 1
+                            IngredientId = 1
                         },
                         new
                         {
                             BurgerId = 2,
-                            IngredientId = 3,
-                            Quantity = 1
+                            IngredientId = 3
                         },
                         new
                         {
                             BurgerId = 3,
-                            IngredientId = 2,
-                            Quantity = 1
+                            IngredientId = 2
                         },
                         new
                         {
                             BurgerId = 3,
-                            IngredientId = 4,
-                            Quantity = 1
+                            IngredientId = 4
                         });
                 });
 

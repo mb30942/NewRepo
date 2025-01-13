@@ -39,6 +39,17 @@ namespace BurgerCraft.Controllers
 
             return View(burger);
         }
+        public async Task<IActionResult> Order(int id)
+        {
+            var burger = await _burgerRepository.GetBurgerById(id);
+
+            if (burger == null)
+            {
+                return NotFound();
+            }
+
+            return View(burger);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Create()
