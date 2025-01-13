@@ -12,12 +12,14 @@ namespace BurgerCraft.Controllers
         private readonly IBurgerRepository _burgerRepository;
         private readonly IBurgerTypeRepository _burgerTypeRepository;
         private readonly IIngredientRepository _ingredientRepository;
+        private readonly ILogger<BurgerController> _logger;
 
-        public BurgerController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository)
+        public BurgerController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository, ILogger<BurgerController> logger)
         {
             _burgerRepository = burgerRepository;
-            _burgerTypeRepository= burgerTypeRepository;
-            _ingredientRepository= ingredientRepository;
+            _burgerTypeRepository = burgerTypeRepository;
+            _ingredientRepository = ingredientRepository;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -86,6 +88,60 @@ namespace BurgerCraft.Controllers
             _burgerRepository.Delete(id);
             return RedirectToAction("Index");
         }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            _logger.LogInformation("Entering Edit method with id: {Id}", id);
+
+            var burger = await _burgerRepository.GetBurgerById(id);
+
+            var burgerTypes = await Task.Run(() => _burgerTypeRepository.GetAll());
+            var ingredients = await Task.Run(() => _ingredientRepository.GetAllIngredients());
+
+            // Get selected ingredient ids
+            var selectedIngredients = burger.BurgerIngredients.Select(bi => bi.IngredientId).ToArray();
+
+            ViewBag.BurgerTypes = new SelectList(burgerTypes, "Id", "Name", burger.BurgerTypeId);
+            ViewBag.Ingredients = ingredients;
+            ViewBag.SelectedIngredients = selectedIngredients;  // Pass selected ingredients
+
+            return View(burger);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Burger burger, int[] selectedIngredients)
+        {
+
+                // Add ingredients to BurgerIngredients
+                if (selectedIngredients != null && selectedIngredients.Length > 0)
+                {
+                    burger.BurgerIngredients = selectedIngredients.Select(ingredientId => new BurgerIngredient
+                    {
+                        IngredientId = ingredientId
+                    }).ToList();
+                }
+
+                try
+                {
+                    await _burgerRepository.UpdateBurger(burger);
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating burger: {ex.Message}");
+                }
+            
+            // Get the necessary data for the dropdown again
+            var burgerTypes = await Task.Run(() => _burgerTypeRepository.GetAll());
+            var ingredients = await Task.Run(() => _ingredientRepository.GetAllIngredients());
+
+            ViewBag.BurgerTypes = new SelectList(burgerTypes, "Id", "Name", burger.BurgerTypeId);
+            ViewBag.Ingredients = ingredients;
+
+            return View(burger);
+        }
+
     }
 }
 
