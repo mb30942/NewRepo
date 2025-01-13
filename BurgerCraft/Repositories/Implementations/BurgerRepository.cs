@@ -49,6 +49,35 @@ namespace BurgerCraft.Repositories.Interfaces
             _context.Burgers.Remove(deleteBurger);
             await _context.SaveChangesAsync();  
         }
+        public async Task UpdateBurger(Burger burger)
+        {
+            var existingBurger = await _context.Burgers
+                .Include(b => b.BurgerIngredients)
+                .FirstOrDefaultAsync(b => b.Id == burger.Id);
+
+            if (existingBurger != null)
+            {
+                // Update scalar properties
+                existingBurger.Name = burger.Name;
+                existingBurger.Price = burger.Price;
+                existingBurger.Description = burger.Description;
+                existingBurger.BurgerTypeId = burger.BurgerTypeId;
+                existingBurger.ImagePath = burger.ImagePath;
+
+                // Update ingredients
+                _context.burgerIngredients.RemoveRange(existingBurger.BurgerIngredients); // Remove old ingredients
+                foreach (var ingredient in burger.BurgerIngredients)
+                {
+                    existingBurger.BurgerIngredients.Add(new BurgerIngredient
+                    {
+                        IngredientId = ingredient.IngredientId
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+            }
+        }
+
 
     }
 }
