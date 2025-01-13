@@ -1,0 +1,62 @@
+﻿@model BurgerCraft.Models.Burger
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header text-center bg-primary text-white">
+                    <h4>Create New Burger</h4>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("Create", "Burger", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Name" class="form-label">Name</label>
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Price" class="form-label">Price</label>
+                            @Html.TextBoxFor(m => m.Price, new { @class = "form-control" })
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Description" class="form-label">Description</label>
+                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = 4 })
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="ImagePath" class="form-label">Image Path</label>
+                            @Html.TextBoxFor(m => m.ImagePath, new { @class = "form-control" })
+                            <span asp-validation-for="ImagePath" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="BurgerTypeId" class="form-label">Select Type</label>
+                            @Html.DropDownList("BurgerTypeId", (SelectList)ViewBag.BurgerTypes, "Select Type", new { @class = "form-control" })
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Select Ingredients:</label>
+                            @foreach (var ingredient in ViewBag.Ingredients as IEnumerable<BurgerCraft.Models.Ingredient>)
+                            {
+                                <div class="form-check">
+                                    <input type="checkbox" name="selectedIngredients" value="@ingredient.Id" class="form-check-input" id="@ingredient.Id" />
+                                    <label for="@ingredient.Id" class="form-check-label">@ingredient.Name</label>
+                                </div>
+                            }
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Save</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

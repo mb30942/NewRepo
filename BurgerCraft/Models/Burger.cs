@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
 namespace BurgerCraft.Models
 {
     public class Burger
@@ -21,6 +22,9 @@ namespace BurgerCraft.Models
         [ForeignKey("BurgerTypeId")]
         public BurgerType BurgerType { get; set; } 
         [Required(ErrorMessage = "Image path is required.")]
-        public string ImagePath { get; set; } 
+        public string ImagePath { get; set; }
+
+        public ICollection<BurgerIngredient> BurgerIngredients { get; set; } = new List<BurgerIngredient>();
     }
 }
+
