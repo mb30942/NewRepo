@@ -1,6 +1,42 @@
 ﻿@model BurgerCraft.Models.Burger
 
-<h2>@Model.Name</h2>
-<p>Price: @Model.Price</p>
-<p>Type: @Model.BurgerType.Name</p>
-<p>Description: @Model.Description</p>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Card for Burger Details -->
+            <div class="card shadow-lg">
+                <img src="@Model.ImagePath" class="card-img-top img-fluid" alt="@Model.Name">
+                <div class="card-body text-center">
+                    <h1 class="card-title">@Model.Name</h1>
+                    <p class="text-muted">Burger Price: <strong>@Model.Price.ToString("C")</strong></p>
+                    <p class="card-text">@Model.Description</p>
+                    <hr>
+                    <h5>Burger Type:</h5>
+                    <p><strong>@Model.BurgerType.Name</strong></p>
+                    <hr>
+                    <h5>Ingredients:</h5>
+                    @if (Model.BurgerIngredients.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var ingredient in Model.BurgerIngredients.Select(bi => bi.Ingredient))
+                            {
+                                <li class="list-group-item">
+                                    @ingredient.Name 
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No ingredients available for this burger.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div class="mt-3 text-center">
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>

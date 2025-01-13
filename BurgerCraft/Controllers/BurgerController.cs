@@ -29,15 +29,16 @@ namespace BurgerCraft.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var burger = await _burgerRepository.GetBurgerById(id);
+
             if (burger == null)
             {
-                return NotFound();
+                return NotFound(); 
             }
 
             return View(burger);
         }
 
-       [HttpGet]
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             var burgerTypes = await Task.Run(() => _burgerTypeRepository.GetAll());

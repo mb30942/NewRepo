@@ -24,9 +24,9 @@ namespace BurgerCraft.Repositories.Interfaces
             .Include(b => b.BurgerType)
             .Include(b => b.BurgerIngredients)
                 .ThenInclude(bi => bi.Ingredient)
-            .Where(b => b.Id == id)  // Ensure the burger exists
+            .Where(b => b.Id == id)  
             .FirstOrDefaultAsync();
-            //Console.WriteLine(burger);
+            
             return burger;
         }
 
