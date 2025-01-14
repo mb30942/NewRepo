@@ -1,5 +1,6 @@
 ﻿using BurgerCraft.Models;
 using BurgerCraft.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BurgerCraft.Repositories.Implementations
 {
@@ -16,6 +17,11 @@ namespace BurgerCraft.Repositories.Implementations
             Console.WriteLine(order);
             _context.Orders.Add(order);
             _context.SaveChanges();
+        }
+
+        public async Task<IEnumerable<Order>> GetAllOrders()
+        {
+            return await _context.Orders.ToListAsync(); 
         }
 
     }

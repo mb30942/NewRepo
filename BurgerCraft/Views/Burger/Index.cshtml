@@ -22,18 +22,7 @@
         <div class="mb-5">
             <img src="~/images/dashboard.png" alt="Burger Banner" class="img-fluid rounded shadow">
         </div>
-        @if (User.IsInRole("Admin"))
-        {
-            <div class="mb-4 text-end">
-                <a href="@Url.Action("Create", "Burger")" class="btn btn-success">Add New Burger</a>
-            </div>
-            <div class="mb-4 text-end">
-                <a href="@Url.Action("Index", "Ingredient")" class="btn btn-success">Add New Ingredient</a>
-            </div>
-            <div class="mb-4 text-end">
-                <a href="@Url.Action("Index", "BurgerType")" class="btn btn-success">Add New Burger Type</a>
-            </div>
-        }
+       
         <!-- Menu Section -->
         <h2 class="mb-4 fw-bold">BurgerCraft Menu</h2>
         <div class="row g-4">
@@ -49,7 +38,7 @@
                             <p class="card-text text-muted">@burger.Description</p>
                             @if (User.IsInRole("User")) 
                             {
-                                <a asp-action="Details" asp-route-id="@burger.Id" class="btn btn-info">View Details</a>
+                                <a asp-action="Details" asp-route-id="@burger.Id" class="btn btn-danger text-white">View Details</a>
                                 @Html.ActionLink("Order", "Order", "Burger", new { id = burger.Id }, new { @class = "btn btn-primary btn-sm" })
                             }
                             <div class="d-flex justify-content-between">
