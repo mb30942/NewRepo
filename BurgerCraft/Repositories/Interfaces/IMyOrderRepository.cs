@@ -6,5 +6,6 @@ namespace BurgerCraft.Repositories.Interfaces
     {
         Task AddMyOrder(MyOrder myOrder);
         Task<IEnumerable<MyOrder>> GetAll();
+        Task Delete(int id);
     }
 }

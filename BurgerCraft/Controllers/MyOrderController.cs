@@ -50,7 +50,13 @@ namespace BurgerCraft.Controllers
             ViewBag.TotalAllOrdersPrice = totalAllOrdersPrice;
             return View(ordersWithDetails);  
         }
-
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            _myOrderRepository.Delete(id);
+            return RedirectToAction("Index");
+        }
 
     }
 }

@@ -23,6 +23,11 @@ namespace BurgerCraft.Repositories.Implementations
             return await _context.MyOrders.ToListAsync();
         }
 
-
+        public async Task Delete(int id)
+        {
+            var deleteMyOrder = _context.MyOrders.Find(id);
+            _context.MyOrders.Remove(deleteMyOrder);
+            await _context.SaveChangesAsync();
+        }
     }
 }
