@@ -11,6 +11,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Ingredient> Ingredients { get; set; }
     public DbSet<BurgerIngredient> burgerIngredients { get; set; }
     public DbSet<Order> Orders { get; set; }
+    public DbSet<MyOrder> MyOrders { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder

@@ -1,0 +1,62 @@
+﻿@using BurgerCraft.ViewModel
+@model IEnumerable<MyOrderViewModel>
+
+<h2>My Orders</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Burger</th>
+            <th>Ingredients</th>
+            <th>Total Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.BurgerName</td>  
+                    <td>
+                        @if (order.Ingredients.Any())
+                        {
+                            <ul>
+                                @foreach (var ingredient in order.Ingredients)
+                                {
+                                    <li>@ingredient</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span>No ingredients</span>
+                        }
+                    </td>
+                    <td>@order.TotalPrice.ToString("C")</td>
+                    <td>
+                        <form asp-action="Delete" asp-controller="MyOrders" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">No orders found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="text-right">
+    <h3>Total Price: @ViewBag.TotalAllOrdersPrice.ToString("C")</h3>
+</div>
+<div class="text-right">
+    <a href="#" class="btn btn-success btn-lg">Secure Order</a>
+</div>

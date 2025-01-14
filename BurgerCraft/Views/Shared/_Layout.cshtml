@@ -42,7 +42,7 @@
                                 <a class="nav-link" href="#">Page</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Page</a>
+                                @Html.ActionLink("My Orders", "Index", "MyOrder", null, new { @class = "nav-link" })
                             </li>
                             <li class="nav-item">
                                 @using (Html.BeginForm("LogoutConfirmed", "Account", FormMethod.Post))

@@ -14,15 +14,17 @@ namespace BurgerCraft.Controllers
         private readonly IBurgerTypeRepository _burgerTypeRepository;
         private readonly IIngredientRepository _ingredientRepository;
         private readonly IOrderRepository _orderRepository;
+        private readonly IMyOrderRepository _myOrderRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<BurgerController> _logger;
 
-        public BurgerController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, ILogger<BurgerController> logger)
+        public BurgerController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, ILogger<BurgerController> logger, IMyOrderRepository myOrderRepository)
         {
             _burgerRepository = burgerRepository;
             _burgerTypeRepository = burgerTypeRepository;
             _ingredientRepository = ingredientRepository;
             _orderRepository = orderRepository;
+            _myOrderRepository = myOrderRepository;
             _userManager = userManager;
             _logger = logger;
         }
@@ -44,17 +46,6 @@ namespace BurgerCraft.Controllers
 
             return View(burger);
         }
-        //public async Task<IActionResult> Order(int id)
-        //{
-        //    var burger = await _burgerRepository.GetBurgerById(id);
-
-        //    if (burger == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(burger);
-        //}
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -221,7 +212,7 @@ namespace BurgerCraft.Controllers
                 return Unauthorized(); 
             }
 
-            var order = new Order
+            var myOrder = new MyOrder
             {
                 UserId = user.Id,
                 BurgerId = BurgerId,
@@ -231,11 +222,11 @@ namespace BurgerCraft.Controllers
 
             if (ModelState.IsValid)
             {
-                await _orderRepository.AddOrder(order); 
+                await _myOrderRepository.AddMyOrder(myOrder); 
                 return RedirectToAction("Index", "Burger"); 
             }
 
-            return View(order);
+            return View(myOrder);
         }
 
 
