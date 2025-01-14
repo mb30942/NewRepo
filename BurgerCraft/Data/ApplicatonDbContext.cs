@@ -10,6 +10,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Burger> Burgers { get; set; }
     public DbSet<Ingredient> Ingredients { get; set; }
     public DbSet<BurgerIngredient> burgerIngredients { get; set; }
+    public DbSet<Order> Orders { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder
@@ -83,6 +84,14 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             new Ingredient { Id = 24, Name = "Cucumber Slices", Price = 0.50M },
             new Ingredient { Id = 25, Name = "Olives", Price = 1.10M }
         );
+        modelBuilder.Entity<BurgerIngredient>().HasData(
+       new BurgerIngredient { BurgerId = 1, IngredientId = 1, Quantity = 1 }, // Lettuce
+       new BurgerIngredient { BurgerId = 1, IngredientId = 2, Quantity = 1 }, // Tomato
+       new BurgerIngredient { BurgerId = 2, IngredientId = 1, Quantity = 1 }, // Lettuce
+       new BurgerIngredient { BurgerId = 2, IngredientId = 3, Quantity = 1 }, // Cheddar Cheese
+       new BurgerIngredient { BurgerId = 3, IngredientId = 2, Quantity = 1 }, // Tomato
+       new BurgerIngredient { BurgerId = 3, IngredientId = 4, Quantity = 1 }  // Beef Patty
+   );
     }
 
 

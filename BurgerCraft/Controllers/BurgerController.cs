@@ -1,6 +1,7 @@
 ﻿using BurgerCraft.Models;
 using BurgerCraft.Repositories.Implementations;
 using BurgerCraft.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -12,13 +13,17 @@ namespace BurgerCraft.Controllers
         private readonly IBurgerRepository _burgerRepository;
         private readonly IBurgerTypeRepository _burgerTypeRepository;
         private readonly IIngredientRepository _ingredientRepository;
+        private readonly IOrderRepository _orderRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<BurgerController> _logger;
 
-        public BurgerController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository, ILogger<BurgerController> logger)
+        public BurgerController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, ILogger<BurgerController> logger)
         {
             _burgerRepository = burgerRepository;
             _burgerTypeRepository = burgerTypeRepository;
             _ingredientRepository = ingredientRepository;
+            _orderRepository = orderRepository;
+            _userManager = userManager;
             _logger = logger;
         }
 
@@ -39,6 +44,17 @@ namespace BurgerCraft.Controllers
 
             return View(burger);
         }
+        //public async Task<IActionResult> Order(int id)
+        //{
+        //    var burger = await _burgerRepository.GetBurgerById(id);
+
+        //    if (burger == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(burger);
+        //}
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -141,6 +157,87 @@ namespace BurgerCraft.Controllers
 
             return View(burger);
         }
+
+        public async Task<IActionResult> Order(int id)
+        {
+            var burger = await _burgerRepository.GetBurgerById(id);
+
+            if (burger == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.AllIngredients = await _ingredientRepository.GetAllIngredients();
+            return View(burger);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Order(int BurgerId, int Quantity, List<int> SelectedIngredients)
+        {
+            var burger = await _burgerRepository.GetBurgerById(BurgerId);
+
+            if (burger == null)
+            {
+                return NotFound();
+            }
+
+            var totalPrice = burger.Price * Quantity;
+
+            List<int> ingredientIds;
+            decimal ingredientsTotal = 0;
+
+            if (SelectedIngredients != null && SelectedIngredients.Any())
+            {
+                ingredientIds = SelectedIngredients;
+
+                foreach (var ingredientId in SelectedIngredients)
+                {
+                    var ingredient = await _ingredientRepository.GetIngredientById(ingredientId);
+                    if (ingredient != null)
+                    {
+                        ingredientsTotal += ingredient.Price;
+                    }
+                }
+                totalPrice += ingredientsTotal;
+            }
+            else
+            {
+                ingredientIds = burger.BurgerIngredients.Select(bi => bi.IngredientId).ToList();
+
+                foreach (var ingredientId in ingredientIds)
+                {
+                    var ingredient = await _ingredientRepository.GetIngredientById(ingredientId);
+                    if (ingredient != null)
+                    {
+                        ingredientsTotal += ingredient.Price;
+                    }
+                }
+            }
+
+
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized(); 
+            }
+
+            var order = new Order
+            {
+                UserId = user.Id,
+                BurgerId = BurgerId,
+                IngredientIds = ingredientIds, 
+                TotalPrice = totalPrice,
+            };
+
+            if (ModelState.IsValid)
+            {
+                await _orderRepository.AddOrder(order); 
+                return RedirectToAction("Index", "Burger"); 
+            }
+
+            return View(order);
+        }
+
 
     }
 }
