@@ -21,6 +21,7 @@ builder.Services.AddScoped<IBurgerRepository, BurgerRepository>();
 builder.Services.AddScoped<IBurgerTypeRepository, BurgerTypeRepository>();
 builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IMyOrderRepository, MyOrderRepository>();
 
 // Add Identity services, specifying ApplicationUser and IdentityRole.
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
