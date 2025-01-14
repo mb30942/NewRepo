@@ -29,5 +29,12 @@ namespace BurgerCraft.Repositories.Implementations
             _context.MyOrders.Remove(deleteMyOrder);
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<MyOrder>> GetAllByUserId(string userId)
+        {
+            return await _context.MyOrders
+                .Where(m => m.UserId == userId)
+                .ToListAsync();
+        }
+
     }
 }

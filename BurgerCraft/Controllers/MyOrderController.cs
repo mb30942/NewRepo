@@ -13,19 +13,26 @@ namespace BurgerCraft.Controllers
         private readonly IBurgerTypeRepository _burgerTypeRepository;
         private readonly IIngredientRepository _ingredientRepository;
         private readonly IMyOrderRepository _myOrderRepository;
+        private readonly IOrderRepository _orderRepository;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public MyOrderController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository, IMyOrderRepository myOrderRepository, UserManager<ApplicationUser> userManager)
+        public MyOrderController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository, IMyOrderRepository myOrderRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager)
         {
             _burgerRepository = burgerRepository;
             _burgerTypeRepository = burgerTypeRepository;
             _ingredientRepository = ingredientRepository;
             _myOrderRepository = myOrderRepository;
+            _orderRepository = orderRepository;
             _userManager = userManager;
         }
         public async Task<IActionResult> Index()
         {
-            var orders = await _myOrderRepository.GetAll(); 
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            var orders = await _myOrderRepository.GetAllByUserId(user.Id);
             var allIngredients = await _ingredientRepository.GetAllIngredients();  
             var allBurgers = await _burgerRepository.GetAllBurgers();  
 
@@ -56,6 +63,40 @@ namespace BurgerCraft.Controllers
         {
             _myOrderRepository.Delete(id);
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SecureOrder()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            
+            var myOrders = await _myOrderRepository.GetAllByUserId(user.Id);
+
+            foreach (var myOrder in myOrders)
+            {
+                var order = new Order
+                {
+                    UserId = user.Id,
+                    BurgerId = myOrder.BurgerId,
+                    IngredientIds = myOrder.IngredientIds,
+                    TotalPrice = myOrder.TotalPrice
+                };
+
+                await _orderRepository.AddOrder(order);
+
+            }
+
+            foreach (var myOrder in myOrders)
+            {
+                await _myOrderRepository.Delete(myOrder.Id);
+            }
+
+            return RedirectToAction("Index", "MyOrder"); 
         }
 
     }
