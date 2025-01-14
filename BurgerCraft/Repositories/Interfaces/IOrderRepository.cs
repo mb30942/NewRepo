@@ -5,5 +5,6 @@ namespace BurgerCraft.Repositories.Interfaces
     public interface IOrderRepository
     {
         Task AddOrder(Order order);
+        Task<IEnumerable<Order>> GetAllOrders();
     }
 }

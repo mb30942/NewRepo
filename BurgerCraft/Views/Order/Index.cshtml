@@ -1,0 +1,41 @@
+﻿@{
+    var enrichedOrders = ViewBag.EnrichedOrders as IEnumerable<dynamic>;
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">All Orders</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Order ID</th>
+                    <th scope="col">User ID</th>
+                    <th scope="col">Burger</th>
+                    <th scope="col">Ingredients</th>
+                    <th scope="col">Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (enrichedOrders != null && enrichedOrders.Any())
+                {
+                    foreach (var item in enrichedOrders)
+                    {
+                        <tr>
+                            <td>@item.Order.Id</td>
+                            <td>@item.Order.UserId</td>
+                            <td>@item.BurgerName</td>
+                            <td>@string.Join(", ", item.IngredientNames)</td>
+                            <td>@item.Order.TotalPrice.ToString("C")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No orders found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
