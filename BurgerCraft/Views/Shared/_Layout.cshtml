@@ -41,9 +41,12 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Page</a>
                             </li>
+                            @if (User.IsInRole("User"))
+                            {
                             <li class="nav-item">
                                 @Html.ActionLink("My Orders", "Index", "MyOrder", null, new { @class = "nav-link" })
                             </li>
+                            }
                             <li class="nav-item">
                                 @using (Html.BeginForm("LogoutConfirmed", "Account", FormMethod.Post))
                                 {
