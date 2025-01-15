@@ -1,5 +1,7 @@
 ﻿@model IEnumerable<BurgerCraft.Models.Burger>
-
+@{
+    var selectedBurgerTypeId = ViewBag.SelectedBurgerTypeId as int?;
+}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,6 +32,31 @@
                 <div id="countdown" class="text-center fw-bold text-danger"></div>
             }
         </div>
+
+             <!-- Dropdown to Select Burger Type and List All Burgers Button in the Same Row -->
+        <form method="get" class="mb-4">
+            <div class="row align-items-center">
+                <!-- Dropdown for Burger Type -->
+                <div class="col-md-8">
+                    <label for="burgerType" class="form-label">Select Burger Type</label>
+                    <select id="burgerType" name="burgerTypeId" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Select Burger Types --</option>
+                        @foreach (var burgerType in ViewBag.BurgerTypes as SelectList)
+                        {
+                            var isSelected = burgerType.Value.ToString() == ViewData["SelectedBurgerTypeId"]?.ToString();
+                            <option value="@burgerType.Value">
+                                @burgerType.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Button to List All Burgers -->
+                <div class="col-md-4 text-center">
+                    <a href="@Url.Action("Index", "Burger")" class="btn btn-secondary w-100">List All Burgers</a>
+                </div>
+            </div>
+        </form>
 
         <!-- Menu Section -->
         <h2 class="mb-4 fw-bold">BurgerCraft Menu</h2>
