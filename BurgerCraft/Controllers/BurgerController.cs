@@ -31,7 +31,7 @@ namespace BurgerCraft.Controllers
             _logger = logger;
             _offerService = offerService;
         }
-        public async Task<IActionResult> Index(int? burgerTypeId)
+        public async Task<IActionResult> Index(int? burgerTypeId, string searchQuery)
         {
             var burgerTypes = _burgerTypeRepository.GetAll();
 
@@ -39,7 +39,11 @@ namespace BurgerCraft.Controllers
             var burgers = burgerTypeId.HasValue
                 ? await _burgerRepository.GetBurgersByType(burgerTypeId.Value)
                 : await _burgerRepository.GetAllBurgers();
-
+            // Search query to filter burgers by name
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                burgers = burgers.Where(b => b.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
             // Apply discount on the burgers
             foreach (var burger in burgers)
             {
