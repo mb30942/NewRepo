@@ -87,9 +87,9 @@ namespace BurgerCraft.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Burger burger, int[] selectedIngredients)
+        public async Task<IActionResult> Create(Burger burger, int[] selectedIngredients, IFormFile ImageFile)
         {
-            //Add into BurgerIngredients
+            // Add selected ingredients to BurgerIngredients
             if (selectedIngredients != null && selectedIngredients.Length > 0)
             {
                 foreach (var ingredientId in selectedIngredients)
@@ -99,6 +99,20 @@ namespace BurgerCraft.Controllers
                         IngredientId = ingredientId
                     });
                 }
+            }
+
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ImageFile.CopyToAsync(stream);
+                }
+
+                burger.ImagePath = "/images/" + uniqueFileName;
             }
 
             try
@@ -113,6 +127,7 @@ namespace BurgerCraft.Controllers
                 return View(burger);
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -164,7 +179,6 @@ namespace BurgerCraft.Controllers
                 Console.WriteLine($"Error updating burger: {ex.Message}");
             }
 
-            // Get the necessary data for the dropdown again
             var burgerTypes = await Task.Run(() => _burgerTypeRepository.GetAll());
             var ingredients = await Task.Run(() => _ingredientRepository.GetAllIngredients());
 
