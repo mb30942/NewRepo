@@ -15,7 +15,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder
-     .UseNpgsql("Host=localhost;Port=5432;Database=burgerCraft;Username=postgres;Password=tijana")
+     .UseNpgsql("Host=localhost;Port=5432;Database=burgerCraft;Username=postgres;Password=postgres")
      .ConfigureWarnings(warnings => warnings.Default(WarningBehavior.Ignore));
 
     }

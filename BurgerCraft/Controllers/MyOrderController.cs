@@ -76,6 +76,9 @@ namespace BurgerCraft.Controllers
 
             
             var myOrders = await _myOrderRepository.GetAllByUserId(user.Id);
+            
+            var orderIds = new List<int>();
+            decimal totalPrice = 0;
 
             foreach (var myOrder in myOrders)
             {
@@ -87,17 +90,55 @@ namespace BurgerCraft.Controllers
                     TotalPrice = myOrder.TotalPrice
                 };
 
-                await _orderRepository.AddOrder(order);
+                var createdOrder =  _orderRepository.AddOrder(order);
+                orderIds.Add(createdOrder.Id);
+                totalPrice += myOrder.TotalPrice;
 
             }
+
+            int uniqueOrderNumber = GenerateUniqueOrderNumber();
 
             foreach (var myOrder in myOrders)
             {
                 await _myOrderRepository.Delete(myOrder.Id);
             }
 
-            return RedirectToAction("Index", "MyOrder"); 
+            return RedirectToAction("OrderConfirmation", new { totalPrice = totalPrice, orderNumber = uniqueOrderNumber });
         }
+
+        private int GenerateUniqueOrderNumber()
+        {
+            Random random = new Random();
+            int orderNumber;
+
+                orderNumber = random.Next(10000, 99999);
+            
+
+            return orderNumber;
+        }
+        public IActionResult OrderConfirmation(decimal totalPrice, int orderNumber)
+        {
+            ViewBag.TotalPrice = totalPrice;
+            ViewBag.OrderNumber = orderNumber;
+            return View();
+        }
+
+        public async Task<IActionResult> GetTotalPrice()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var orders = await _myOrderRepository.GetAllByUserId(user.Id);
+            var totalPrice = orders.Sum(order => order.TotalPrice);
+
+            return PartialView("_OrderTotal", totalPrice);
+        }
+
+
+
 
     }
 }

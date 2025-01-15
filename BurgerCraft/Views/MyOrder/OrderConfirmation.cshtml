@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Order Confirmation";
+    var totalPrice = (decimal)ViewBag.TotalPrice;
+    var orderNumber = (int)ViewBag.OrderNumber;
+}
+
+<div style="background-color: #d9534f; height: 100vh; display: flex; justify-content: center; align-items: center;">
+    <div style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center;">
+        <h2>The order has been placed</h2>
+        <p>Your order number is @orderNumber</p>
+        <p>Your Price is @totalPrice.ToString("C")</p>
+        <a href="@Url.Action("Index", "MyOrder")" class="btn btn-primary" style="margin-top: 10px;">Back to Orders</a>
+    </div>
+</div>

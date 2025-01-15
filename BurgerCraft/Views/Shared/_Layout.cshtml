@@ -51,12 +51,12 @@
                                 </li>
 
                             }
-                            
+
                             @if (User.IsInRole("User"))
                             {
                                 <li class="nav-item">
-                                @Html.ActionLink("My Orders", "Index", "MyOrder", null, new { @class = "nav-link" })
-                            </li>
+                                    @Html.ActionLink("My Orders", "Index", "MyOrder", null, new { @class = "nav-link" })
+                                </li>
                             }
                             <li class="nav-item text-white">
                                 @using (Html.BeginForm("LogoutConfirmed", "Account", FormMethod.Post))
@@ -77,12 +77,27 @@
             @RenderBody()
         </main>
     </div>
+    @if (User.IsInRole("User"))
+    {
+        <div id="orderTotalContainer"></div>
 
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $.get('@Url.Action("GetTotalPrice", "MyOrder")', function (data) {
+                    $('#orderTotalContainer').html(data);
+                });
+            });
+        </script>
+
+    }else{
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2025 - BurgerCraft - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+    }
+   
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
