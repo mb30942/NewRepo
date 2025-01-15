@@ -123,6 +123,19 @@ namespace BurgerCraft.Controllers
             return View();
         }
 
+        public async Task<IActionResult> GetTotalPrice()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var orders = await _myOrderRepository.GetAllByUserId(user.Id);
+            var totalPrice = orders.Sum(order => order.TotalPrice);
+
+            return PartialView("_OrderTotal", totalPrice);
+        }
 
 
 
