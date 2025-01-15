@@ -35,7 +35,7 @@
 
             <!-- Button to toggle between order types -->
             <div class="text-center mt-3">
-                <button id="customizeOrderBtn" class="btn btn-warning" onclick="toggleCustomizeOrder()">Customize Order</button>
+                <button id="customizeOrderBtn" class="btn btn-dark" onclick="toggleCustomizeOrder()">Customize Order</button>
             </div>
 
             <!-- Non-Customized Order Form -->
@@ -48,7 +48,7 @@
                             <label for="quantity">Quantity:</label>
                             <input type="number" class="form-control" id="quantity" name="Quantity" min="1" value="1" required />
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 mt-3">Order Now</button>
+                        <button type="submit" class="btn btn-danger w-100 mt-3">Order Now</button>
                     </form>
                 </div>
             </div>
@@ -75,14 +75,9 @@
                             <label for="quantity">Quantity:</label>
                             <input type="number" class="form-control" id="quantity" name="Quantity" min="1" value="1" required />
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 mt-3">Order Now</button>
+                        <button type="submit" class="btn btn-danger w-100 mt-3">Order Now</button>
                     </form>
                 </div>
-            </div>
-
-            <!-- Back Button -->
-            <div class="mt-3 text-center">
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
             </div>
         </div>
     </div>
