@@ -84,7 +84,7 @@
                                 @if (User.IsInRole("User"))
                                 {
                                     <a asp-action="Details" asp-route-id="@burger.Id" class="btn btn-danger">View Details</a>
-                                    @Html.ActionLink("Order", "Order", "Burger", new { id = burger.Id }, new { @class = "btn btn-primary btn-sm" })
+                                    @Html.ActionLink("Order", "Order", "Burger", new { id = burger.Id }, new { @class = "btn btn-dark " })
                                 }
 
                                 @if (User.IsInRole("Admin"))
