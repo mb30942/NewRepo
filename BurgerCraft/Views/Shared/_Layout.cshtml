@@ -35,22 +35,24 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-auto">
+                            <!-- Search Form -->
                             <li>
                                 <form method="get" class="mb-4">
-                                    <div class="row align-items-center">
+                                    <div class="row align-items-center gx-2">
                                         <!-- Search by Name -->
-                                        <div class="col-md-5">
-                                            <label for="searchQuery" class="form-label">Search</label>
+                                        <div class="col-12 col-md-8">
+                                            <label for="searchQuery" class="form-label visually-hidden">Search</label>
                                             <input type="text" id="searchQuery" name="searchQuery" class="form-control form-control-sm" value="@Context.Request.Query["searchQuery"]" placeholder="Search Burger">
                                         </div>
 
                                         <!-- Search Button -->
-                                        <div class="col-md-3">
-                                            <button type="submit" class="btn btn-primary btn-sm w-100">Search</button>
+                                        <div class="col-12 col-md-4">
+                                            <button type="submit" class="btn btn-dark btn-sm w-100">Search</button>
                                         </div>
                                     </div>
                                 </form>
                             </li>
+
                             
                             @if (User.IsInRole("Admin"))
                             {
