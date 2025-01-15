@@ -31,20 +31,27 @@ namespace BurgerCraft.Controllers
             _logger = logger;
             _offerService = offerService;
         }
-
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? burgerTypeId)
         {
-            var burgers = await _burgerRepository.GetAllBurgers();
+            var burgerTypes = _burgerTypeRepository.GetAll();
 
+            // Filter burgers by BurgerTypeId if it's provided
+            var burgers = burgerTypeId.HasValue
+                ? await _burgerRepository.GetBurgersByType(burgerTypeId.Value)
+                : await _burgerRepository.GetAllBurgers();
+
+            // Apply discount on the burgers
             foreach (var burger in burgers)
             {
                 burger.Price = _offerService.ApplyDiscount(burger.Price);
             }
 
             ViewBag.IsOfferActive = _offerService.IsTimeSensitiveOfferActive();
+            ViewBag.BurgerTypes = new SelectList(burgerTypes, "Id", "Name", burgerTypeId);  // Populate the dropdown with burger types
 
             return View(burgers);
         }
+
 
 
         public async Task<IActionResult> Details(int id)
