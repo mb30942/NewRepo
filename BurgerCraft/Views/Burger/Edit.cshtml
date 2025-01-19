@@ -1,13 +1,13 @@
 ﻿@model BurgerCraft.Models.Burger
 
 @{
-    var selectedIngredientsList = ViewBag.SelectedIngredients as int[]; // ViewBag.SelectedIngredients should be an array of int
-    var selectedIngredients = selectedIngredientsList?.ToList(); // Convert to List<int> for easy Contains check
+    var selectedIngredientsList = ViewBag.SelectedIngredients as int[]; 
+    var selectedIngredients = selectedIngredientsList?.ToList();
 }
 
 
 
-@using (Html.BeginForm("Edit", "Burger", FormMethod.Post))
+@using (Html.BeginForm("Edit", "Burger", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -17,8 +17,12 @@
             <img src="@Model.ImagePath" alt="Burger Image" class="img-fluid rounded border" style="max-width: 300px;" />
         </div>
         <h2 class="text-center">Edit Burger</h2>
-        @Html.TextBoxFor(model => model.ImagePath, new { @class = "form-control mt-3", placeholder = "Enter image URL" })
-        @Html.ValidationMessageFor(model => model.ImagePath, "", new { @class = "text-danger" })
+        <div class="form-group mt-3">
+            <label for="ImageFile" class="form-label">Upload New Image (optional)</label>
+            @Html.TextBox("ImageFile", null, new { type = "file", @class = "form-control" })
+        </div>
+
+        @Html.HiddenFor(model => model.ImagePath)
     </div>
    
     <div class="form-group">
@@ -73,7 +77,7 @@
     .image-preview img {
         margin: 20px auto;
         display: block;
-        border: 3px solid #007bff; /* Blue border */
+        border: 3px solid #007bff;
         padding: 5px;
     }
 

@@ -157,10 +157,10 @@ namespace BurgerCraft.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Burger burger, int[] selectedIngredients)
+        public async Task<IActionResult> Edit(Burger burger, int[] selectedIngredients, IFormFile ImageFile)
         {
 
-            // Add ingredients to BurgerIngredients
+           
             if (selectedIngredients != null && selectedIngredients.Length > 0)
             {
                 burger.BurgerIngredients = selectedIngredients.Select(ingredientId => new BurgerIngredient
@@ -168,7 +168,20 @@ namespace BurgerCraft.Controllers
                     IngredientId = ingredientId
                 }).ToList();
             }
+            // Handle image upload
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ImageFile.CopyToAsync(stream);
+                }
+
+                burger.ImagePath = "/images/" + uniqueFileName;
+            }
             try
             {
                 await _burgerRepository.UpdateBurger(burger);
