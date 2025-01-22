@@ -16,7 +16,7 @@ namespace BurgerCraft.Services
         {
             if (IsTimeSensitiveOfferActive())
             {
-                return originalPrice * 0.8m; // Apply a 20% discount
+                return originalPrice * 0.8m; 
             }
             return originalPrice; 
         }

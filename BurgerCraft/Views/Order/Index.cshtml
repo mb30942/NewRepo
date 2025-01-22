@@ -1,5 +1,6 @@
 ﻿@{
     var enrichedOrders = ViewBag.EnrichedOrders as IEnumerable<dynamic>;
+    var usernames = ViewBag.Usernames as Dictionary<string, string>; 
 }
 
 <div class="container mt-5">
@@ -9,7 +10,7 @@
             <thead class="table-dark">
                 <tr>
                     <th scope="col">Order ID</th>
-                    <th scope="col">User ID</th>
+                    <th scope="col">Username</th>
                     <th scope="col">Burger</th>
                     <th scope="col">Ingredients</th>
                     <th scope="col">Total Price</th>
@@ -20,9 +21,11 @@
                 {
                     foreach (var item in enrichedOrders)
                     {
+                        string username = usernames.ContainsKey(item.Order.UserId) ? usernames[item.Order.UserId] : "Unknown User";
+
                         <tr>
                             <td>@item.Order.Id</td>
-                            <td>@item.Order.UserId</td>
+                            <td>@username</td> 
                             <td>@item.BurgerName</td>
                             <td>@string.Join(", ", item.IngredientNames)</td>
                             <td>@item.Order.TotalPrice.ToString("C")</td>
