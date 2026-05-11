@@ -1,7 +1,8 @@
-﻿
-namespace BurgerCraft.Services
+using BurgerCraft.Services.Interfaces;
+
+namespace BurgerCraft.Services.Implementations
 {
-    public class TimeSensitiveOfferService
+    public class TimeSensitiveOfferService : ITimeSensitiveOfferService
     {
         public bool IsTimeSensitiveOfferActive()
         {

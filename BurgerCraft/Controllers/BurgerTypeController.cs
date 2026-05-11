@@ -1,16 +1,16 @@
-﻿using BurgerCraft.Models;
+using BurgerCraft.Models;
 using BurgerCraft.Repositories.Implementations;
-using BurgerCraft.Repositories.Interfaces;
+using BurgerCraft.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BurgerCraft.Controllers
 {
     public class BurgerTypeController : Controller
     {
-        private readonly IBurgerTypeRepository _burgerTypeRepository;
-        public BurgerTypeController(IBurgerTypeRepository burgerTypeRepository)
+        private readonly IBurgerTypeService _burgerTypeService;
+        public BurgerTypeController(IBurgerTypeService burgerTypeService)
         {
-            _burgerTypeRepository = burgerTypeRepository;
+            _burgerTypeService = burgerTypeService;
         }
 
         [HttpGet]
@@ -30,7 +30,7 @@ namespace BurgerCraft.Controllers
 
             if (ModelState.IsValid)
             {
-                _burgerTypeRepository.Add(burgerType); 
+                _burgerTypeService.Add(burgerType); 
                 return RedirectToAction("Index"); 
             }
 
@@ -45,19 +45,19 @@ namespace BurgerCraft.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var burgerType = _burgerTypeRepository.GetById(id);
+            var burgerType = _burgerTypeService.GetById(id);
 
             if (burgerType != null)
             {
                 //Console.WriteLine(burgerType);
-                _burgerTypeRepository.Delete(id);
+                _burgerTypeService.Delete(id);
             }
             return RedirectToAction("Index");
         }
 
         public IActionResult Index()
         {
-            var burgerTypes = _burgerTypeRepository.GetAll();
+            var burgerTypes = _burgerTypeService.GetAll();
             return View(burgerTypes);
         }
 

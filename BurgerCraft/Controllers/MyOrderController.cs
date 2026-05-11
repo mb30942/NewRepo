@@ -1,6 +1,7 @@
-﻿using BurgerCraft.Models;
+using BurgerCraft.Models;
 using BurgerCraft.Repositories.Implementations;
 using BurgerCraft.Repositories.Interfaces;
+using BurgerCraft.Services.Interfaces;
 using BurgerCraft.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,20 +10,20 @@ namespace BurgerCraft.Controllers
 {
     public class MyOrderController : Controller
     {
-        private readonly IBurgerRepository _burgerRepository;
-        private readonly IBurgerTypeRepository _burgerTypeRepository;
-        private readonly IIngredientRepository _ingredientRepository;
-        private readonly IMyOrderRepository _myOrderRepository;
-        private readonly IOrderRepository _orderRepository;
+        private readonly IBurgerService _burgerService;
+        private readonly IBurgerTypeService _burgerTypeService;
+        private readonly IIngredientService _ingredientService;
+        private readonly IMyOrderService _myOrderService;
+        private readonly IOrderService _orderService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public MyOrderController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository, IMyOrderRepository myOrderRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager)
+        public MyOrderController(IBurgerService burgerService, IBurgerTypeService burgerTypeService, IIngredientService ingredientService, IMyOrderService myOrderService, IOrderService orderService, UserManager<ApplicationUser> userManager)
         {
-            _burgerRepository = burgerRepository;
-            _burgerTypeRepository = burgerTypeRepository;
-            _ingredientRepository = ingredientRepository;
-            _myOrderRepository = myOrderRepository;
-            _orderRepository = orderRepository;
+            _burgerService = burgerService;
+            _burgerTypeService = burgerTypeService;
+            _ingredientService = ingredientService;
+            _myOrderService = myOrderService;
+            _orderService = orderService;
             _userManager = userManager;
         }
         public async Task<IActionResult> Index()
@@ -32,9 +33,9 @@ namespace BurgerCraft.Controllers
             {
                 return Unauthorized();
             }
-            var orders = await _myOrderRepository.GetAllByUserId(user.Id);
-            var allIngredients = await _ingredientRepository.GetAllIngredients();  
-            var allBurgers = await _burgerRepository.GetAllBurgers();  
+            var orders = await _myOrderService.GetAllByUserId(user.Id);
+            var allIngredients = await _ingredientService.GetAllIngredients();  
+            var allBurgers = await _burgerService.GetAllBurgers();  
 
             
             var ingredientDictionary = allIngredients.ToDictionary(i => i.Id, i => i.Name);
@@ -61,7 +62,7 @@ namespace BurgerCraft.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            _myOrderRepository.Delete(id);
+            _myOrderService.Delete(id);
             return RedirectToAction("Index");
         }
 
@@ -75,7 +76,7 @@ namespace BurgerCraft.Controllers
             }
 
             
-            var myOrders = await _myOrderRepository.GetAllByUserId(user.Id);
+            var myOrders = await _myOrderService.GetAllByUserId(user.Id);
             
             var orderIds = new List<int>();
             decimal totalPrice = 0;
@@ -90,7 +91,8 @@ namespace BurgerCraft.Controllers
                     TotalPrice = myOrder.TotalPrice
                 };
 
-                var createdOrder =  _orderRepository.AddOrder(order);
+                var createdOrder = order;
+                await _orderService.AddOrder(order);
                 orderIds.Add(createdOrder.Id);
                 totalPrice += myOrder.TotalPrice;
 
@@ -100,7 +102,7 @@ namespace BurgerCraft.Controllers
 
             foreach (var myOrder in myOrders)
             {
-                await _myOrderRepository.Delete(myOrder.Id);
+                await _myOrderService.Delete(myOrder.Id);
             }
 
             return RedirectToAction("OrderConfirmation", new { totalPrice = totalPrice, orderNumber = uniqueOrderNumber });
@@ -131,7 +133,7 @@ namespace BurgerCraft.Controllers
                 return Unauthorized();
             }
 
-            var orders = await _myOrderRepository.GetAllByUserId(user.Id);
+            var orders = await _myOrderService.GetAllByUserId(user.Id);
             var totalPrice = orders.Sum(order => order.TotalPrice);
 
             return PartialView("_OrderTotal", totalPrice);

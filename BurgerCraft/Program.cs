@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using BurgerCraft.Models;
 using BurgerCraft.Repositories.Interfaces;
 using BurgerCraft.Repositories.Implementations;
-using BurgerCraft.Services;
+using BurgerCraft.Services.Interfaces;
+using BurgerCraft.Services.Implementations;
 var builder = WebApplication.CreateBuilder(args);
 
 IConfigurationRoot configuration = new ConfigurationBuilder()
@@ -23,7 +24,13 @@ builder.Services.AddScoped<IBurgerTypeRepository, BurgerTypeRepository>();
 builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IMyOrderRepository, MyOrderRepository>();
-builder.Services.AddScoped<TimeSensitiveOfferService>();
+
+builder.Services.AddScoped<IBurgerService, BurgerService>();
+builder.Services.AddScoped<IBurgerTypeService, BurgerTypeService>();
+builder.Services.AddScoped<IIngredientService, IngredientService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IMyOrderService, MyOrderService>();
+builder.Services.AddScoped<ITimeSensitiveOfferService, TimeSensitiveOfferService>();
 
 // Add Identity services, specifying ApplicationUser and IdentityRole.
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

@@ -1,7 +1,6 @@
-﻿using BurgerCraft.Models;
+using BurgerCraft.Models;
 using BurgerCraft.Repositories.Implementations;
-using BurgerCraft.Repositories.Interfaces;
-using BurgerCraft.Services;
+using BurgerCraft.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,34 +10,34 @@ namespace BurgerCraft.Controllers
 {
     public class BurgerController : Controller
     {
-        private readonly IBurgerRepository _burgerRepository;
-        private readonly IBurgerTypeRepository _burgerTypeRepository;
-        private readonly IIngredientRepository _ingredientRepository;
-        private readonly IOrderRepository _orderRepository;
-        private readonly IMyOrderRepository _myOrderRepository;
+        private readonly IBurgerService _burgerService;
+        private readonly IBurgerTypeService _burgerTypeService;
+        private readonly IIngredientService _ingredientService;
+        private readonly IOrderService _orderService;
+        private readonly IMyOrderService _myOrderService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<BurgerController> _logger;
-        private readonly TimeSensitiveOfferService _offerService;
+        private readonly ITimeSensitiveOfferService _offerService;
 
-        public BurgerController(IBurgerRepository burgerRepository, IBurgerTypeRepository burgerTypeRepository, IIngredientRepository ingredientRepository, IOrderRepository orderRepository, UserManager<ApplicationUser> userManager, ILogger<BurgerController> logger, IMyOrderRepository myOrderRepository, TimeSensitiveOfferService offerService)
+        public BurgerController(IBurgerService burgerService, IBurgerTypeService burgerTypeService, IIngredientService ingredientService, IOrderService orderService, UserManager<ApplicationUser> userManager, ILogger<BurgerController> logger, IMyOrderService myOrderService, ITimeSensitiveOfferService offerService)
         {
-            _burgerRepository = burgerRepository;
-            _burgerTypeRepository = burgerTypeRepository;
-            _ingredientRepository = ingredientRepository;
-            _orderRepository = orderRepository;
-            _myOrderRepository = myOrderRepository;
+            _burgerService = burgerService;
+            _burgerTypeService = burgerTypeService;
+            _ingredientService = ingredientService;
+            _orderService = orderService;
+            _myOrderService = myOrderService;
             _userManager = userManager;
             _logger = logger;
             _offerService = offerService;
         }
         public async Task<IActionResult> Index(int? burgerTypeId, string searchQuery)
         {
-            var burgerTypes = _burgerTypeRepository.GetAll();
+            var burgerTypes = _burgerTypeService.GetAll();
 
             // Filter burgers by BurgerTypeId if it's provided
             var burgers = burgerTypeId.HasValue
-                ? await _burgerRepository.GetBurgersByType(burgerTypeId.Value)
-                : await _burgerRepository.GetAllBurgers();
+                ? await _burgerService.GetBurgersByType(burgerTypeId.Value)
+                : await _burgerService.GetAllBurgers();
             // Search query to filter burgers by name
             if (!string.IsNullOrEmpty(searchQuery))
             {
@@ -60,7 +59,7 @@ namespace BurgerCraft.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            var burger = await _burgerRepository.GetBurgerById(id);
+            var burger = await _burgerService.GetBurgerById(id);
 
             if (burger == null)
             {
@@ -75,8 +74,8 @@ namespace BurgerCraft.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var burgerTypes = await Task.Run(() => _burgerTypeRepository.GetAll());
-            var ingredients = await Task.Run(() => _ingredientRepository.GetAllIngredients());
+            var burgerTypes = await Task.Run(() => _burgerTypeService.GetAll());
+            var ingredients = await Task.Run(() => _ingredientService.GetAllIngredients());
 
             ViewBag.BurgerTypes = new SelectList(burgerTypes, "Id", "Name");
 
@@ -117,7 +116,7 @@ namespace BurgerCraft.Controllers
 
             try
             {
-                await _burgerRepository.AddBurger(burger);
+                await _burgerService.AddBurger(burger);
                 Console.WriteLine("Burger saved successfully.");
                 return RedirectToAction("Index");
             }
@@ -132,7 +131,7 @@ namespace BurgerCraft.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            _burgerRepository.Delete(id);
+            _burgerService.Delete(id);
             return RedirectToAction("Index");
         }
         [HttpGet]
@@ -140,10 +139,10 @@ namespace BurgerCraft.Controllers
         {
             _logger.LogInformation("Entering Edit method with id: {Id}", id);
 
-            var burger = await _burgerRepository.GetBurgerById(id);
+            var burger = await _burgerService.GetBurgerById(id);
 
-            var burgerTypes = await Task.Run(() => _burgerTypeRepository.GetAll());
-            var ingredients = await Task.Run(() => _ingredientRepository.GetAllIngredients());
+            var burgerTypes = await Task.Run(() => _burgerTypeService.GetAll());
+            var ingredients = await Task.Run(() => _ingredientService.GetAllIngredients());
 
             // Get selected ingredient ids
             var selectedIngredients = burger.BurgerIngredients.Select(bi => bi.IngredientId).ToArray();
@@ -184,7 +183,7 @@ namespace BurgerCraft.Controllers
             }
             try
             {
-                await _burgerRepository.UpdateBurger(burger);
+                await _burgerService.UpdateBurger(burger);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -192,8 +191,8 @@ namespace BurgerCraft.Controllers
                 Console.WriteLine($"Error updating burger: {ex.Message}");
             }
 
-            var burgerTypes = await Task.Run(() => _burgerTypeRepository.GetAll());
-            var ingredients = await Task.Run(() => _ingredientRepository.GetAllIngredients());
+            var burgerTypes = await Task.Run(() => _burgerTypeService.GetAll());
+            var ingredients = await Task.Run(() => _ingredientService.GetAllIngredients());
 
             ViewBag.BurgerTypes = new SelectList(burgerTypes, "Id", "Name", burger.BurgerTypeId);
             ViewBag.Ingredients = ingredients;
@@ -203,7 +202,7 @@ namespace BurgerCraft.Controllers
 
         public async Task<IActionResult> Order(int id)
         {
-            var burger = await _burgerRepository.GetBurgerById(id);
+            var burger = await _burgerService.GetBurgerById(id);
 
             if (burger == null)
             {
@@ -212,13 +211,13 @@ namespace BurgerCraft.Controllers
 
             burger.Price = _offerService.ApplyDiscount(burger.Price);
 
-            ViewBag.AllIngredients = await _ingredientRepository.GetAllIngredients();
+            ViewBag.AllIngredients = await _ingredientService.GetAllIngredients();
             return View(burger);
         }
         [HttpPost]
         public async Task<IActionResult> Order(int BurgerId, int Quantity, List<int> SelectedIngredients)
         {
-            var burger = await _burgerRepository.GetBurgerById(BurgerId);
+            var burger = await _burgerService.GetBurgerById(BurgerId);
 
             if (burger == null)
             {
@@ -237,7 +236,7 @@ namespace BurgerCraft.Controllers
 
                 foreach (var ingredientId in SelectedIngredients)
                 {
-                    var ingredient = await _ingredientRepository.GetIngredientById(ingredientId);
+                    var ingredient = await _ingredientService.GetIngredientById(ingredientId);
                     if (ingredient != null)
                     {
                         ingredientsTotal += ingredient.Price;
@@ -251,7 +250,7 @@ namespace BurgerCraft.Controllers
 
                 foreach (var ingredientId in ingredientIds)
                 {
-                    var ingredient = await _ingredientRepository.GetIngredientById(ingredientId);
+                    var ingredient = await _ingredientService.GetIngredientById(ingredientId);
                     if (ingredient != null)
                     {
                         ingredientsTotal += ingredient.Price;
@@ -277,7 +276,7 @@ namespace BurgerCraft.Controllers
 
             if (ModelState.IsValid)
             {
-                await _myOrderRepository.AddMyOrder(myOrder);
+                await _myOrderService.AddMyOrder(myOrder);
                 return RedirectToAction("Index", "Burger");
             }
 

@@ -1,6 +1,7 @@
-﻿using BurgerCraft.Models;
+using BurgerCraft.Models;
 using BurgerCraft.Repositories.Implementations;
 using BurgerCraft.Repositories.Interfaces;
+using BurgerCraft.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,26 +12,26 @@ namespace BurgerCraft.Controllers
     [Authorize(Roles = "Admin")]
     public class OrderController : Controller
     {
-            private readonly IOrderRepository _orderRepository;
-            private readonly IBurgerRepository _burgerRepository;
-            private readonly IIngredientRepository _ingredientRepository;
+            private readonly IOrderService _orderService;
+            private readonly IBurgerService _burgerService;
+            private readonly IIngredientService _ingredientService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public OrderController(IOrderRepository orderRepository, IBurgerRepository burgerRepository, IIngredientRepository ingredientRepository,
+        public OrderController(IOrderService orderService, IBurgerService burgerService, IIngredientService ingredientService,
         UserManager<ApplicationUser> userManager)
             {
-                _orderRepository = orderRepository;
-                _burgerRepository = burgerRepository;
-                _ingredientRepository = ingredientRepository;
+                _orderService = orderService;
+                _burgerService = burgerService;
+                _ingredientService = ingredientService;
             _userManager = userManager;
         }
 
             public async Task<IActionResult> Index()
             {
-                var orders = await _orderRepository.GetAllOrders();
+                var orders = await _orderService.GetAllOrders();
 
-                var allBurgers = await _burgerRepository.GetAllBurgers();
-                var allIngredients = await _ingredientRepository.GetAllIngredients();
+                var allBurgers = await _burgerService.GetAllBurgers();
+                var allIngredients = await _ingredientService.GetAllIngredients();
 
                 var burgerDictionary = allBurgers.ToDictionary(b => b.Id, b => b.Name);
                 var ingredientDictionary = allIngredients.ToDictionary(i => i.Id, i => i.Name);

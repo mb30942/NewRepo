@@ -1,5 +1,6 @@
-﻿using BurgerCraft.Models;
+using BurgerCraft.Models;
 using BurgerCraft.Repositories.Implementations;
+using BurgerCraft.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -9,17 +10,17 @@ namespace BurgerCraft.Controllers
     [Authorize(Roles = "Admin")] // Restrict access to Admins only
     public class IngredientController : Controller
     {
-        private readonly IIngredientRepository _ingredientRepository;
+        private readonly IIngredientService _ingredientService;
 
-        public IngredientController(IIngredientRepository ingredientRepository)
+        public IngredientController(IIngredientService ingredientService)
         {
-            _ingredientRepository = ingredientRepository;
+            _ingredientService = ingredientService;
         }
 
         // GET: Ingredient/Index
         public async Task<IActionResult> Index()
         {
-            var ingredients = await _ingredientRepository.GetAllIngredients();
+            var ingredients = await _ingredientService.GetAllIngredients();
             return View(ingredients);
         }
 
@@ -36,7 +37,7 @@ namespace BurgerCraft.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _ingredientRepository.AddIngredient(ingredient);
+                await _ingredientService.AddIngredient(ingredient);
                 return RedirectToAction(nameof(Index));
             }
             return View(ingredient);
@@ -45,7 +46,7 @@ namespace BurgerCraft.Controllers
         // GET: Ingredient/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            var ingredient = await _ingredientRepository.GetIngredientById(id);
+            var ingredient = await _ingredientService.GetIngredientById(id);
             if (ingredient == null)
             {
                 return NotFound();
@@ -63,7 +64,7 @@ namespace BurgerCraft.Controllers
 
             if (ModelState.IsValid)
             {
-                await _ingredientRepository.UpdateIngredient(ingredient);
+                await _ingredientService.UpdateIngredient(ingredient);
                 return RedirectToAction(nameof(Index));
             }
             return View(ingredient);
@@ -72,7 +73,7 @@ namespace BurgerCraft.Controllers
         // GET: Ingredient/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var ingredient = await _ingredientRepository.GetIngredientById(id);
+            var ingredient = await _ingredientService.GetIngredientById(id);
             if (ingredient == null)
                 return NotFound();
 
@@ -84,7 +85,7 @@ namespace BurgerCraft.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _ingredientRepository.DeleteIngredient(id);
+            await _ingredientService.DeleteIngredient(id);
             return RedirectToAction(nameof(Index));
         }
     }
