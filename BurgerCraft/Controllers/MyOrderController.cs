@@ -75,48 +75,9 @@ namespace BurgerCraft.Controllers
                 return Unauthorized();
             }
 
-            
-            var myOrders = await _myOrderService.GetAllByUserId(user.Id);
-            
-            var orderIds = new List<int>();
-            decimal totalPrice = 0;
-
-            foreach (var myOrder in myOrders)
-            {
-                var order = new Order
-                {
-                    UserId = user.Id,
-                    BurgerId = myOrder.BurgerId,
-                    IngredientIds = myOrder.IngredientIds,
-                    TotalPrice = myOrder.TotalPrice
-                };
-
-                var createdOrder = order;
-                await _orderService.AddOrder(order);
-                orderIds.Add(createdOrder.Id);
-                totalPrice += myOrder.TotalPrice;
-
-            }
-
-            int uniqueOrderNumber = GenerateUniqueOrderNumber();
-
-            foreach (var myOrder in myOrders)
-            {
-                await _myOrderService.Delete(myOrder.Id);
-            }
+            var (totalPrice, uniqueOrderNumber) = await _myOrderService.SecureOrderAsync(user.Id);
 
             return RedirectToAction("OrderConfirmation", new { totalPrice = totalPrice, orderNumber = uniqueOrderNumber });
-        }
-
-        private int GenerateUniqueOrderNumber()
-        {
-            Random random = new Random();
-            int orderNumber;
-
-                orderNumber = random.Next(10000, 99999);
-            
-
-            return orderNumber;
         }
         public IActionResult OrderConfirmation(decimal totalPrice, int orderNumber)
         {

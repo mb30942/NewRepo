@@ -217,70 +217,28 @@ namespace BurgerCraft.Controllers
         [HttpPost]
         public async Task<IActionResult> Order(int BurgerId, int Quantity, List<int> SelectedIngredients)
         {
-            var burger = await _burgerService.GetBurgerById(BurgerId);
-
-            if (burger == null)
-            {
-                return NotFound();
-            }
-
-            var discountedPrice = _offerService.ApplyDiscount(burger.Price);
-            var totalPrice = discountedPrice * Quantity;
-
-            List<int> ingredientIds;
-            decimal ingredientsTotal = 0;
-
-            if (SelectedIngredients != null && SelectedIngredients.Any())
-            {
-                ingredientIds = SelectedIngredients;
-
-                foreach (var ingredientId in SelectedIngredients)
-                {
-                    var ingredient = await _ingredientService.GetIngredientById(ingredientId);
-                    if (ingredient != null)
-                    {
-                        ingredientsTotal += ingredient.Price;
-                    }
-                }
-                totalPrice += ingredientsTotal;
-            }
-            else
-            {
-                ingredientIds = burger.BurgerIngredients.Select(bi => bi.IngredientId).ToList();
-
-                foreach (var ingredientId in ingredientIds)
-                {
-                    var ingredient = await _ingredientService.GetIngredientById(ingredientId);
-                    if (ingredient != null)
-                    {
-                        ingredientsTotal += ingredient.Price;
-                    }
-                }
-            }
-
-
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return Unauthorized();
             }
 
-            var myOrder = new MyOrder
+            try
             {
-                UserId = user.Id,
-                BurgerId = BurgerId,
-                IngredientIds = ingredientIds,
-                TotalPrice = totalPrice,
-            };
+                var myOrder = await _myOrderService.PrepareOrderAsync(user.Id, BurgerId, Quantity, SelectedIngredients);
 
-            if (ModelState.IsValid)
-            {
-                await _myOrderService.AddMyOrder(myOrder);
-                return RedirectToAction("Index", "Burger");
+                if (ModelState.IsValid)
+                {
+                    await _myOrderService.AddMyOrder(myOrder);
+                    return RedirectToAction("Index", "Burger");
+                }
+
+                return View(myOrder);
             }
-
-            return View(myOrder);
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
         }
 
 
