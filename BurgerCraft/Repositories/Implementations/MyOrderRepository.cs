@@ -14,7 +14,6 @@ namespace BurgerCraft.Repositories.Implementations
         }
         public async Task AddMyOrder(MyOrder myOrder)
         {
-            Console.WriteLine(myOrder);
             _context.MyOrders.Add(myOrder);
             _context.SaveChanges();
         }

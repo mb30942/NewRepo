@@ -1,6 +1,7 @@
 using BurgerCraft.Models;
 using BurgerCraft.Repositories.Interfaces;
 using BurgerCraft.Services.Interfaces;
+using BurgerCraft.ViewModel;
 
 namespace BurgerCraft.Services.Implementations
 {
@@ -44,6 +45,27 @@ namespace BurgerCraft.Services.Implementations
         public async Task<IEnumerable<MyOrder>> GetAllByUserId(string userId)
         {
             return await _myOrderRepository.GetAllByUserId(userId);
+        }
+
+        public async Task<IEnumerable<MyOrderViewModel>> GetEnrichedOrdersByUserId(string userId)
+        {
+            var orders = await _myOrderRepository.GetAllByUserId(userId);
+            var allIngredients = await _ingredientService.GetAllIngredients();
+            var allBurgers = await _burgerService.GetAllBurgers();
+
+            var ingredientDictionary = allIngredients.ToDictionary(i => i.Id, i => i.Name);
+            var burgerDictionary = allBurgers.ToDictionary(b => b.Id, b => b.Name);
+
+            return orders.Select(order => new MyOrderViewModel
+            {
+                Id = order.Id,
+                BurgerId = order.BurgerId,
+                BurgerName = burgerDictionary.ContainsKey(order.BurgerId) ? burgerDictionary[order.BurgerId] : "Unknown Burger",
+                TotalPrice = order.TotalPrice,
+                Ingredients = order.IngredientIds
+                    .Select(id => ingredientDictionary.ContainsKey(id) ? ingredientDictionary[id] : "Unknown")
+                    .ToList()
+            }).ToList();
         }
 
         public async Task<MyOrder> PrepareOrderAsync(string userId, int burgerId, int quantity, List<int> selectedIngredients)
@@ -101,7 +123,7 @@ namespace BurgerCraft.Services.Implementations
         public async Task<(decimal TotalPrice, int OrderNumber)> SecureOrderAsync(string userId)
         {
             var myOrders = await _myOrderRepository.GetAllByUserId(userId);
-            
+
             decimal totalPrice = 0;
 
             foreach (var myOrder in myOrders)

@@ -31,6 +31,7 @@ builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IMyOrderService, MyOrderService>();
 builder.Services.AddScoped<ITimeSensitiveOfferService, TimeSensitiveOfferService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 // Add Identity services, specifying ApplicationUser and IdentityRole.
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

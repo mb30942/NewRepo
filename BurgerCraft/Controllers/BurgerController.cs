@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-
 namespace BurgerCraft.Controllers
 {
     public class BurgerController : Controller
@@ -12,60 +11,52 @@ namespace BurgerCraft.Controllers
         private readonly IBurgerService _burgerService;
         private readonly IBurgerTypeService _burgerTypeService;
         private readonly IIngredientService _ingredientService;
-        private readonly IOrderService _orderService;
         private readonly IMyOrderService _myOrderService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<BurgerController> _logger;
         private readonly ITimeSensitiveOfferService _offerService;
 
-        public BurgerController(IBurgerService burgerService, IBurgerTypeService burgerTypeService, IIngredientService ingredientService, IOrderService orderService, UserManager<ApplicationUser> userManager, ILogger<BurgerController> logger, IMyOrderService myOrderService, ITimeSensitiveOfferService offerService)
+        public BurgerController(IBurgerService burgerService, IBurgerTypeService burgerTypeService,
+            IIngredientService ingredientService, UserManager<ApplicationUser> userManager,
+            ILogger<BurgerController> logger, IMyOrderService myOrderService,
+            ITimeSensitiveOfferService offerService)
         {
             _burgerService = burgerService;
             _burgerTypeService = burgerTypeService;
             _ingredientService = ingredientService;
-            _orderService = orderService;
             _myOrderService = myOrderService;
             _userManager = userManager;
             _logger = logger;
             _offerService = offerService;
         }
+
         public async Task<IActionResult> Index(int? burgerTypeId, string searchQuery)
         {
             var burgerTypes = _burgerTypeService.GetAll();
 
-            // Filter burgers by BurgerTypeId if it's provided
             var burgers = burgerTypeId.HasValue
-                ? await _burgerService.GetBurgersByType(burgerTypeId.Value)
-                : await _burgerService.GetAllBurgers();
-            // Search query to filter burgers by name
+                ? await _burgerService.GetBurgersByTypeWithDiscount(burgerTypeId.Value)
+                : await _burgerService.GetAllBurgersWithDiscount();
+
             if (!string.IsNullOrEmpty(searchQuery))
             {
                 burgers = burgers.Where(b => b.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
             }
-            // Apply discount on the burgers
-            foreach (var burger in burgers)
-            {
-                burger.Price = _offerService.ApplyDiscount(burger.Price);
-            }
 
             ViewBag.IsOfferActive = _offerService.IsTimeSensitiveOfferActive();
-            ViewBag.BurgerTypes = new SelectList(burgerTypes, "Id", "Name", burgerTypeId);  // Populate the dropdown with burger types
+            ViewBag.BurgerTypes = new SelectList(burgerTypes, "Id", "Name", burgerTypeId);
 
             return View(burgers);
         }
 
-
-
         public async Task<IActionResult> Details(int id)
         {
-            var burger = await _burgerService.GetBurgerById(id);
+            var burger = await _burgerService.GetBurgerByIdWithDiscount(id);
 
             if (burger == null)
             {
                 return NotFound();
             }
-
-            burger.Price = _offerService.ApplyDiscount(burger.Price);
 
             return View(burger);
         }
@@ -77,7 +68,6 @@ namespace BurgerCraft.Controllers
             var ingredients = await Task.Run(() => _ingredientService.GetAllIngredients());
 
             ViewBag.BurgerTypes = new SelectList(burgerTypes, "Id", "Name");
-
             ViewBag.Ingredients = ingredients;
 
             return View();
@@ -87,36 +77,18 @@ namespace BurgerCraft.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Burger burger, int[] selectedIngredients, IFormFile ImageFile)
         {
-            // Add selected ingredients to BurgerIngredients
             if (selectedIngredients != null && selectedIngredients.Length > 0)
             {
                 foreach (var ingredientId in selectedIngredients)
                 {
-                    burger.BurgerIngredients.Add(new BurgerIngredient
-                    {
-                        IngredientId = ingredientId
-                    });
+                    burger.BurgerIngredients.Add(new BurgerIngredient { IngredientId = ingredientId });
                 }
-            }
-
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(stream);
-                }
-
-                burger.ImagePath = "/images/" + uniqueFileName;
             }
 
             try
             {
-                await _burgerService.AddBurger(burger);
-                Console.WriteLine("Burger saved successfully.");
+                // Image saving is now handled inside BurgerService.AddBurger
+                await _burgerService.AddBurger(burger, ImageFile);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -133,17 +105,15 @@ namespace BurgerCraft.Controllers
             _burgerService.Delete(id);
             return RedirectToAction("Index");
         }
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             _logger.LogInformation("Entering Edit method with id: {Id}", id);
 
             var burger = await _burgerService.GetBurgerById(id);
-
             var burgerTypes = await Task.Run(() => _burgerTypeService.GetAll());
             var ingredients = await Task.Run(() => _ingredientService.GetAllIngredients());
-
-            // Get selected ingredient ids
             var selectedIngredients = burger.BurgerIngredients.Select(bi => bi.IngredientId).ToArray();
 
             ViewBag.BurgerTypes = new SelectList(burgerTypes, "Id", "Name", burger.BurgerTypeId);
@@ -153,12 +123,9 @@ namespace BurgerCraft.Controllers
             return View(burger);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Edit(Burger burger, int[] selectedIngredients, IFormFile ImageFile)
         {
-
-           
             if (selectedIngredients != null && selectedIngredients.Length > 0)
             {
                 burger.BurgerIngredients = selectedIngredients.Select(ingredientId => new BurgerIngredient
@@ -166,23 +133,11 @@ namespace BurgerCraft.Controllers
                     IngredientId = ingredientId
                 }).ToList();
             }
-            // Handle image upload
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(stream);
-                }
-
-                burger.ImagePath = "/images/" + uniqueFileName;
-            }
             try
             {
-                await _burgerService.UpdateBurger(burger);
+                // Image saving is now handled inside BurgerService.UpdateBurger
+                await _burgerService.UpdateBurger(burger, ImageFile);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -201,18 +156,18 @@ namespace BurgerCraft.Controllers
 
         public async Task<IActionResult> Order(int id)
         {
-            var burger = await _burgerService.GetBurgerById(id);
+            // Discount applied inside service
+            var burger = await _burgerService.GetBurgerByIdWithDiscount(id);
 
             if (burger == null)
             {
                 return NotFound();
             }
 
-            burger.Price = _offerService.ApplyDiscount(burger.Price);
-
             ViewBag.AllIngredients = await _ingredientService.GetAllIngredients();
             return View(burger);
         }
+
         [HttpPost]
         public async Task<IActionResult> Order(int BurgerId, int Quantity, List<int> SelectedIngredients)
         {
@@ -239,8 +194,5 @@ namespace BurgerCraft.Controllers
                 return NotFound();
             }
         }
-
-
     }
 }
-

@@ -8,22 +8,15 @@ namespace BurgerCraft.Controllers
 {
     public class MyOrderController : Controller
     {
-        private readonly IBurgerService _burgerService;
-        private readonly IBurgerTypeService _burgerTypeService;
-        private readonly IIngredientService _ingredientService;
         private readonly IMyOrderService _myOrderService;
-        private readonly IOrderService _orderService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public MyOrderController(IBurgerService burgerService, IBurgerTypeService burgerTypeService, IIngredientService ingredientService, IMyOrderService myOrderService, IOrderService orderService, UserManager<ApplicationUser> userManager)
+        public MyOrderController(IMyOrderService myOrderService, UserManager<ApplicationUser> userManager)
         {
-            _burgerService = burgerService;
-            _burgerTypeService = burgerTypeService;
-            _ingredientService = ingredientService;
             _myOrderService = myOrderService;
-            _orderService = orderService;
             _userManager = userManager;
         }
+
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -31,31 +24,15 @@ namespace BurgerCraft.Controllers
             {
                 return Unauthorized();
             }
-            var orders = await _myOrderService.GetAllByUserId(user.Id);
-            var allIngredients = await _ingredientService.GetAllIngredients();  
-            var allBurgers = await _burgerService.GetAllBurgers();  
 
-            
-            var ingredientDictionary = allIngredients.ToDictionary(i => i.Id, i => i.Name);
+            var ordersWithDetails = await _myOrderService.GetEnrichedOrdersByUserId(user.Id);
 
-           
-            var burgerDictionary = allBurgers.ToDictionary(b => b.Id, b => b.Name);
-
-            
-            var ordersWithDetails = orders.Select(order => new MyOrderViewModel
-            {
-                Id = order.Id,
-                BurgerId = order.BurgerId,
-                BurgerName = burgerDictionary.ContainsKey(order.BurgerId) ? burgerDictionary[order.BurgerId] : "Unknown Burger",
-                TotalPrice = order.TotalPrice,
-                Ingredients = order.IngredientIds.Select(id => ingredientDictionary.ContainsKey(id) ? ingredientDictionary[id] : "Unknown").ToList()
-            }).ToList();
-           
             var totalAllOrdersPrice = ordersWithDetails.Sum(order => order.TotalPrice);
-
             ViewBag.TotalAllOrdersPrice = totalAllOrdersPrice;
-            return View(ordersWithDetails);  
+
+            return View(ordersWithDetails);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -77,6 +54,7 @@ namespace BurgerCraft.Controllers
 
             return RedirectToAction("OrderConfirmation", new { totalPrice = totalPrice, orderNumber = uniqueOrderNumber });
         }
+
         public IActionResult OrderConfirmation(decimal totalPrice, int orderNumber)
         {
             ViewBag.TotalPrice = totalPrice;
@@ -97,9 +75,5 @@ namespace BurgerCraft.Controllers
 
             return PartialView("_OrderTotal", totalPrice);
         }
-
-
-
-
     }
 }
