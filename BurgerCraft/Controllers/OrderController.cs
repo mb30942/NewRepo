@@ -1,6 +1,4 @@
 using BurgerCraft.Models;
-using BurgerCraft.Repositories.Implementations;
-using BurgerCraft.Repositories.Interfaces;
 using BurgerCraft.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

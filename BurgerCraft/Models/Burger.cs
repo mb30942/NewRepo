@@ -20,11 +20,11 @@ namespace BurgerCraft.Models
         [Required(ErrorMessage = "Burger type is required.")]
         public int BurgerTypeId { get; set; } 
         [ForeignKey("BurgerTypeId")]
-        public BurgerType BurgerType { get; set; } 
+        public BurgerType BurgerType { get; set; }   // Many-to-One
         [Required(ErrorMessage = "Image path is required.")]
         public string ImagePath { get; set; }
 
-        public ICollection<BurgerIngredient> BurgerIngredients { get; set; } = new List<BurgerIngredient>();
+        public ICollection<BurgerIngredient> BurgerIngredients { get; set; } = new List<BurgerIngredient>(); //Many-to-Many 
     }
 }
 
