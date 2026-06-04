@@ -1,0 +1,139 @@
+using BurgerCraftAPI.DTOs.MyOrders;
+using BurgerCraftAPI.Models;
+using BurgerCraftAPI.Repositories.Interfaces;
+using BurgerCraftAPI.Services.Interfaces;
+
+namespace BurgerCraftAPI.Services.Implementations
+{
+    public class MyOrderService : IMyOrderService
+    {
+        private readonly IMyOrderRepository _myOrderRepository;
+        private readonly IBurgerService _burgerService;
+        private readonly IIngredientService _ingredientService;
+        private readonly ITimeSensitiveOfferService _offerService;
+        private readonly IOrderService _orderService;
+
+        public MyOrderService(
+            IMyOrderRepository myOrderRepository,
+            IBurgerService burgerService,
+            IIngredientService ingredientService,
+            ITimeSensitiveOfferService offerService,
+            IOrderService orderService)
+        {
+            _myOrderRepository = myOrderRepository;
+            _burgerService = burgerService;
+            _ingredientService = ingredientService;
+            _offerService = offerService;
+            _orderService = orderService;
+        }
+
+        public async Task AddMyOrder(MyOrder myOrder)
+        {
+            await _myOrderRepository.AddMyOrder(myOrder);
+        }
+
+        public async Task<IEnumerable<MyOrder>> GetAll()
+        {
+            return await _myOrderRepository.GetAll();
+        }
+
+        public async Task<IEnumerable<MyOrder>> GetAllByUserId(string userId)
+        {
+            return await _myOrderRepository.GetAllByUserId(userId);
+        }
+
+        public async Task Delete(int id)
+        {
+            await _myOrderRepository.Delete(id);
+        }
+
+        public async Task<IEnumerable<MyOrderDto>> GetEnrichedOrdersByUserId(string userId)
+        {
+            var orders = await _myOrderRepository.GetAllByUserId(userId);
+            var allIngredients = await _ingredientService.GetAllIngredients();
+            var allBurgers = await _burgerService.GetAllBurgers();
+
+            var ingredientDict = allIngredients.ToDictionary(i => i.Id, i => i.Name);
+            var burgerDict = allBurgers.ToDictionary(b => b.Id, b => b.Name);
+
+            return orders.Select(order => new MyOrderDto
+            {
+                Id = order.Id,
+                BurgerId = order.BurgerId,
+                BurgerName = burgerDict.TryGetValue(order.BurgerId, out var bName) ? bName : "Unknown Burger",
+                TotalPrice = order.TotalPrice,
+                Ingredients = order.IngredientIds
+                    .Select(id => ingredientDict.TryGetValue(id, out var iName) ? iName : "Unknown")
+                    .ToList()
+            }).ToList();
+        }
+
+        public async Task<MyOrder> PrepareOrderAsync(string userId, int burgerId, int quantity, List<int> selectedIngredients)
+        {
+            var burger = await _burgerService.GetBurgerById(burgerId)
+                ?? throw new KeyNotFoundException($"Burger with ID {burgerId} was not found.");
+
+            var discountedPrice = _offerService.ApplyDiscount(burger.Price);
+            var totalPrice = discountedPrice * quantity;
+
+            List<int> ingredientIds;
+            decimal ingredientsTotal = 0;
+
+            if (selectedIngredients != null && selectedIngredients.Any())
+            {
+                ingredientIds = selectedIngredients;
+                foreach (var ingredientId in selectedIngredients)
+                {
+                    var ingredient = await _ingredientService.GetIngredientById(ingredientId);
+                    if (ingredient != null)
+                        ingredientsTotal += ingredient.Price;
+                }
+                totalPrice += ingredientsTotal;
+            }
+            else
+            {
+                ingredientIds = burger.BurgerIngredients.Select(bi => bi.IngredientId).ToList();
+                foreach (var ingredientId in ingredientIds)
+                {
+                    var ingredient = await _ingredientService.GetIngredientById(ingredientId);
+                    if (ingredient != null)
+                        ingredientsTotal += ingredient.Price;
+                }
+            }
+
+            return new MyOrder
+            {
+                UserId = userId,
+                BurgerId = burgerId,
+                IngredientIds = ingredientIds,
+                TotalPrice = totalPrice
+            };
+        }
+
+        public async Task<(decimal TotalPrice, int OrderNumber)> SecureOrderAsync(string userId)
+        {
+            var myOrders = await _myOrderRepository.GetAllByUserId(userId);
+            decimal totalPrice = 0;
+
+            foreach (var myOrder in myOrders)
+            {
+                var order = new Order
+                {
+                    UserId = userId,
+                    BurgerId = myOrder.BurgerId,
+                    IngredientIds = myOrder.IngredientIds,
+                    TotalPrice = myOrder.TotalPrice
+                };
+                await _orderService.AddOrder(order);
+                totalPrice += myOrder.TotalPrice;
+            }
+
+            var orderNumber = new Random().Next(10000, 99999);
+
+            foreach (var myOrder in myOrders)
+                await _myOrderRepository.Delete(myOrder.Id);
+
+            return (totalPrice, orderNumber);
+        }
+    }
+}
